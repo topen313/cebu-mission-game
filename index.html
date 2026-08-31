@@ -41,11 +41,8 @@
     <!-- 1. 玩家設定 -->
     <div class="bg-amber-100 p-4 rounded-none pixel-box space-y-3">
       <div>
-        <label class="block text-xs font-bold text-amber-900 mb-1">🎮 你的暱稱 (確認後即鎖定)：</label>
-        <div class="flex gap-2">
-          <input type="text" id="playerName" placeholder="例如：小明" class="w-full bg-white border-2 border-slate-800 p-1.5 text-base text-slate-800 focus:outline-none disabled:bg-slate-200 disabled:text-slate-600 font-bold">
-          <button id="lockNameBtn" onclick="confirmAndLockName()" class="pixel-btn bg-sky-400 hover:bg-sky-300 text-slate-950 px-3 py-1 font-bold whitespace-nowrap text-xs">🔒 鎖定暱稱</button>
-        </div>
+        <label class="block text-xs font-bold text-amber-900 mb-1">🎮 你的暱稱：</label>
+        <input type="text" id="playerName" placeholder="請輸入暱稱 (例如：小明)" class="w-full bg-white border-2 border-slate-800 p-1.5 text-base text-slate-800 focus:outline-none font-bold">
       </div>
 
       <button id="drawBtn" onclick="drawThreeCandidates()" class="pixel-btn w-full bg-orange-400 hover:bg-orange-300 text-slate-950 font-bold py-2.5 text-base">
@@ -167,13 +164,80 @@
       <textarea id="notes" placeholder="記錄你覺得誰剛剛怪怪的、做了什麼事（晚餐揭曉指認用）..." class="w-full h-20 bg-white border-2 border-slate-800 p-2 text-sm text-slate-800 focus:outline-none focus:bg-amber-50 resize-none"></textarea>
     </div>
 
-    <!-- 6. 晚餐揭曉區 -->
+    <!-- 6. 🏆 晚餐揭曉與最終獎懲規則 -->
     <div class="bg-white p-4 rounded-none pixel-box space-y-3">
-      <h2 class="text-sm font-bold text-slate-800">🌙 晚餐揭曉與重置</h2>
-      <button onclick="revealMyMission()" class="pixel-btn w-full bg-rose-500 hover:bg-rose-400 text-white font-bold py-2.5 text-base">📢 揭曉我的任務 (秀給全團看)</button>
-      <div id="revealResultArea" class="hidden bg-amber-50 p-3 text-sm space-y-2 border-2 border-slate-800"></div>
+      <h2 class="text-sm font-bold text-slate-900 flex items-center gap-1">
+        <span>🏆 晚餐揭曉與計分規則（8 人戰場）</span>
+      </h2>
+
+      <!-- 計分表格 -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs font-bold text-center border-2 border-slate-800">
+          <thead>
+            <tr class="bg-amber-300 border-b-2 border-slate-800 text-amber-950">
+              <th class="p-1 border-r border-slate-800">完成次數</th>
+              <th class="p-1 border-r border-slate-800">基礎分</th>
+              <th class="p-1 border-r border-slate-800 bg-emerald-100 text-emerald-900">沒被猜中</th>
+              <th class="p-1 bg-rose-100 text-rose-900">被猜中</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-300 bg-white">
+            <tr>
+              <td class="p-1 border-r border-slate-800 bg-slate-50">0 次</td>
+              <td class="p-1 border-r border-slate-800">0 分</td>
+              <td class="p-1 border-r border-slate-800 font-extrabold text-emerald-700">0 分</td>
+              <td class="p-1 font-extrabold text-rose-700">0 分</td>
+            </tr>
+            <tr>
+              <td class="p-1 border-r border-slate-800 bg-slate-50">1 次</td>
+              <td class="p-1 border-r border-slate-800">0 分</td>
+              <td class="p-1 border-r border-slate-800 font-extrabold text-emerald-700">1 分</td>
+              <td class="p-1 font-extrabold text-rose-700">0 分</td>
+            </tr>
+            <tr>
+              <td class="p-1 border-r border-slate-800 bg-slate-50">2 次</td>
+              <td class="p-1 border-r border-slate-800">1 分</td>
+              <td class="p-1 border-r border-slate-800 font-extrabold text-emerald-700">2 分</td>
+              <td class="p-1 font-extrabold text-rose-700">1.5 分</td>
+            </tr>
+            <tr>
+              <td class="p-1 border-r border-slate-800 bg-slate-50">3 次</td>
+              <td class="p-1 border-r border-slate-800">3 分</td>
+              <td class="p-1 border-r border-slate-800 font-extrabold text-emerald-700">4 分</td>
+              <td class="p-1 font-extrabold text-rose-700">2.5 分</td>
+            </tr>
+            <tr class="bg-amber-50">
+              <td class="p-1 border-r border-slate-800 font-extrabold text-amber-900">4 次</td>
+              <td class="p-1 border-r border-slate-800">4 分</td>
+              <td class="p-1 border-r border-slate-800 font-extrabold text-emerald-700">5 分 👑</td>
+              <td class="p-1 font-extrabold text-rose-700">3.5 分</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       
-      <button onclick="resetDay()" class="pixel-btn w-full bg-slate-300 hover:bg-slate-200 text-slate-800 font-bold py-1.5 text-xs">☀️ 重置準備下一天任務</button>
+      <!-- 8 人獎懲規則說明 -->
+      <div class="bg-amber-50 p-2.5 border-2 border-slate-800 text-xs leading-relaxed space-y-2.5 font-bold text-slate-700">
+        <p class="text-amber-900 font-extrabold border-b border-amber-300 pb-1 text-sm">🔥 8 人同樂最終獎懲機制：</p>
+        
+        <div class="space-y-0.5 bg-emerald-50 p-2 border border-emerald-300">
+          <p class="text-emerald-900 font-extrabold">🥇 最高分｜任務王（1 人）</p>
+          <p class="text-slate-700">🦀 <b>王者免單</b>：選一天指定晚餐完全不用付錢！（餐費由其餘 7 人平攤）</p>
+          <p class="text-slate-700">🚐 <b>優選寶座</b>：隔天搭保姆車優先挑選最佳座位。</p>
+        </div>
+
+        <div class="space-y-0.5 bg-sky-50 p-2 border border-sky-300">
+          <p class="text-sky-900 font-extrabold">💸 一般輸家｜中間群眾（6 人）</p>
+          <p class="text-slate-700">💬 <b>真心話大考驗</b>：晚餐現場每人必須現場抽出並回答 <b>1 題爆點真心話</b>，不准逃避！</p>
+        </div>
+
+        <div class="space-y-0.5 bg-rose-50 p-2 border border-rose-300">
+          <p class="text-rose-900 font-extrabold">👹 躺平輸家｜最低分（1 人）</p>
+          <p class="text-slate-700">📸 <b>地獄大頭貼</b>：全團票選當天個人最醜崩壞照，LINE / IG 大頭貼強制更換 <b>7 天</b>！（若最低分有多人則由全團投票選出）</p>
+        </div>
+      </div>
+
+      <button onclick="resetDay()" class="pixel-btn w-full bg-slate-300 hover:bg-slate-200 text-slate-800 font-bold py-2 text-xs">☀️ 揭曉結束，重置準備下一天任務</button>
     </div>
 
   </main>
@@ -257,10 +321,7 @@
       const savedNotes = localStorage.getItem('cebu_notes');
       const savedName = localStorage.getItem('cebu_player_name');
       
-      if (savedName) {
-        document.getElementById('playerName').value = savedName;
-        lockNameInput(true);
-      }
+      if (savedName) document.getElementById('playerName').value = savedName;
       if (savedNotes) document.getElementById('notes').value = savedNotes;
 
       if (savedSelected) {
@@ -292,30 +353,10 @@
       });
     };
 
-    function confirmAndLockName() {
-      const input = document.getElementById('playerName');
-      const name = input.value.trim();
-      if (!name) return alert('請先輸入暱稱！');
-      
-      localStorage.setItem('cebu_player_name', name);
-      lockNameInput(true);
-      alert(`暱稱已成功鎖定為「${name}」！`);
+    document.getElementById('playerName').addEventListener('input', (e) => {
+      localStorage.setItem('cebu_player_name', e.target.value.trim());
       updateCheckProgress();
-    }
-
-    function lockNameInput(isLocked) {
-      const input = document.getElementById('playerName');
-      const btn = document.getElementById('lockNameBtn');
-      if (isLocked) {
-        input.disabled = true;
-        btn.disabled = true;
-        btn.innerText = '🔒 已鎖定';
-      } else {
-        input.disabled = false;
-        btn.disabled = false;
-        btn.innerText = '🔒 鎖定暱稱';
-      }
-    }
+    });
 
     document.getElementById('notes').addEventListener('input', (e) => {
       localStorage.setItem('cebu_notes', e.target.value);
@@ -329,10 +370,7 @@
 
     function drawThreeCandidates() {
       const name = document.getElementById('playerName').value.trim();
-      if (!name) return alert('請先輸入並鎖定「暱稱」喔！');
-      
-      lockNameInput(true);
-      localStorage.setItem('cebu_player_name', name);
+      if (!name) return alert('請先輸入「暱稱」喔！');
 
       if (selectedTask || localStorage.getItem('cebu_candidates')) {
         return alert('今天已經取得過 3 大任務囉！若要重新抽取請於晚餐後按「重置準備下一天任務」。');
@@ -457,7 +495,7 @@
     }
 
     function resetDay() {
-      if (confirm('確定要重置並準備下一天的任務嗎？（這將會解鎖暱稱並清除今日紀錄）')) {
+      if (confirm('確定要重置並準備下一天的任務嗎？（這將會清除資料庫與今日紀錄）')) {
         const name = document.getElementById('playerName').value.trim();
         if (name) {
           progressRef.child(name).remove();
@@ -466,10 +504,6 @@
         candidateTasks = [];
         localStorage.removeItem('cebu_selected_task');
         localStorage.removeItem('cebu_candidates');
-        localStorage.removeItem('cebu_player_name');
-        
-        document.getElementById('playerName').value = '';
-        lockNameInput(false);
 
         resetChecks();
         
@@ -477,38 +511,13 @@
         document.getElementById('candidateSection').classList.remove('flex');
         document.getElementById('finalSection').classList.add('hidden');
         document.getElementById('finalSection').classList.remove('flex');
-        document.getElementById('revealResultArea').classList.add('hidden');
 
         const btn = document.getElementById('drawBtn');
         btn.disabled = false;
         btn.innerText = '🎴 取得今日 3 大任務 (每日限 1 次)';
 
-        alert('已成功重置！明天請輸入暱稱並重新抽取下一天的任務。');
+        alert('已成功重置！明天請重新抽取下一天的任務。');
       }
-    }
-
-    function revealMyMission() {
-      if (!selectedTask) return alert('你還沒選擇今天的任務喔！');
-      const name = document.getElementById('playerName').value.trim() || '我';
-      let count = 0;
-      for (let i = 1; i <= 4; i++) {
-        if (document.getElementById(`chk${i}`).checked) count++;
-      }
-      
-      const area = document.getElementById('revealResultArea');
-      area.classList.remove('hidden');
-      area.innerHTML = `
-        <div class="font-bold text-rose-700 text-base mb-1">🎭 ${name} 的今日隱藏任務：</div>
-        <div class="text-slate-900 font-bold bg-amber-100 p-2 border border-amber-300 space-y-1">
-          <div>
-            <span class="text-xs text-amber-800 bg-amber-200 px-1 py-0.5 border border-amber-400 font-bold mr-1">${selectedTask.cat}</span>
-          </div>
-          <div>${selectedTask.text}</div>
-          <div class="text-xs ${count === 4 ? 'text-emerald-700' : 'text-amber-800'} font-bold border-t border-amber-300 pt-1">
-            最終達成率：${count} / 4 ${count === 4 ? '（完全成功！🎉）' : ''}
-          </div>
-        </div>
-      `;
     }
   </script>
 </body>

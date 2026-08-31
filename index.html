@@ -239,7 +239,6 @@
     let candidateTasks = [];
     let selectedTask = null;
 
-    // 根據名字產生固定的雜湊數字
     function hashCode(str) {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
@@ -258,24 +257,33 @@
       if (savedName) document.getElementById('playerName').value = savedName;
       if (savedNotes) document.getElementById('notes').value = savedNotes;
 
-      // 如果已經選擇了最終任務
       if (savedSelected) {
         selectedTask = JSON.parse(savedSelected);
         showFinalTask();
-        loadChecks();
         disableDrawBtn('今日任務已確定');
       } 
-      // 如果已經抽過牌但還沒選擇卡片
       else if (savedCandidates) {
         candidateTasks = JSON.parse(savedCandidates);
         showCandidateSection();
         disableDrawBtn('今日已抽牌');
       }
 
-      // 監聽全團即時進度
+      // 監聽 Firebase 即時同步全團進度與自己的打勾狀態
       progressRef.on('value', (snapshot) => {
         const data = snapshot.val() || {};
         renderGroupProgress(data);
+
+        // 如果目前使用者有輸入名字，自動從 Firebase 讀取打勾狀態恢復
+        const name = document.getElementById('playerName').value.trim();
+        if (name && data[name] && data[name].checks) {
+          const checks = data[name].checks;
+          for (let i = 1; i <= 4; i++) {
+            document.getElementById(`chk${i}`).checked = !!checks[i - 1];
+          }
+          let count = 0;
+          checks.forEach(c => { if(c) count++; });
+          document.getElementById('stepCounterText').innerText = `進度: ${count}/4`;
+        }
       });
     };
 
@@ -305,7 +313,6 @@
         return alert('今天已經取得過 3 大任務囉！若要重新抽取請於晚餐後按「重置準備下一天任務」。');
       }
 
-      // 使用暱稱 + 今天日期做雜湊，保證每個人今天抽到的 3 張卡不相同且固定
       const seed = hashCode(name + new Date().toDateString());
       const idx1 = seed % taskDatabase.length;
       const idx2 = (seed + 7) % taskDatabase.length;
@@ -361,7 +368,6 @@
       document.getElementById('finalCat').innerText = selectedTask.cat;
       document.getElementById('finalText').innerText = selectedTask.text;
       document.getElementById('innerFinal').classList.remove('rotate-y-180');
-      updateCheckProgress();
     }
 
     function toggleFinalFlip() {
@@ -370,41 +376,22 @@
 
     function updateCheckProgress() {
       let count = 0;
+      const checks = [];
       for (let i = 1; i <= 4; i++) {
-        if (document.getElementById(`chk${i}`).checked) count++;
+        const isChecked = document.getElementById(`chk${i}`).checked;
+        checks.push(isChecked);
+        if (isChecked) count++;
       }
       document.getElementById('stepCounterText').innerText = `進度: ${count}/4`;
-      
-      // 儲存本地打勾狀態
-      const checks = [
-        document.getElementById('chk1').checked,
-        document.getElementById('chk2').checked,
-        document.getElementById('chk3').checked,
-        document.getElementById('chk4').checked
-      ];
-      localStorage.setItem('cebu_task_checks', JSON.stringify(checks));
 
-      // 傳送到 Firebase
+      // 直接同步打勾資料到 Firebase
       const name = document.getElementById('playerName').value.trim();
       if (name) {
         progressRef.child(name).set({
           progress: `${count}/4`,
+          checks: checks,
           updatedAt: Date.now()
         });
-      }
-    }
-
-    function loadChecks() {
-      const saved = localStorage.getItem('cebu_task_checks');
-      if (saved) {
-        const checks = JSON.parse(saved);
-        for (let i = 1; i <= 4; i++) {
-          document.getElementById(`chk${i}`).checked = checks[i - 1] || false;
-        }
-        
-        let count = 0;
-        checks.forEach(c => { if(c) count++; });
-        document.getElementById('stepCounterText').innerText = `進度: ${count}/4`;
       }
     }
 
@@ -412,7 +399,6 @@
       for (let i = 1; i <= 4; i++) {
         document.getElementById(`chk${i}`).checked = false;
       }
-      localStorage.removeItem('cebu_task_checks');
       updateCheckProgress();
     }
 

@@ -3,186 +3,297 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🇵🇭 宿霧隱藏任務 🕵️‍♀️</title>
+  <title>🇵🇭 宿霧隱藏任務 👾 Pixel Island</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- 引入像素風字體 (VT323 & Press Start 2P) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
   <style>
+    body {
+      font-family: 'VT323', monospace;
+      letter-spacing: 0.5px;
+    }
+    .pixel-font-title {
+      font-family: 'Press Start 2P', cursive;
+    }
+    /* 像素邊框與陰影效果 */
+    .pixel-box {
+      border: 4px solid #1e293b;
+      box-shadow: 4px 4px 0px #1e293b;
+    }
+    .pixel-box-sm {
+      border: 3px solid #1e293b;
+      box-shadow: 3px 3px 0px #1e293b;
+    }
+    .pixel-btn {
+      border: 3px solid #1e293b;
+      box-shadow: 0px 4px 0px #1e293b;
+      transition: all 0.1s ease;
+    }
+    .pixel-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0px 0px 0px #1e293b;
+    }
+    /* 3D 翻頁 */
     .perspective-1000 { perspective: 1000px; }
     .transform-style-3d { transform-style: preserve-3d; }
     .backface-hidden { backface-visibility: hidden; }
     .rotate-y-180 { transform: rotateY(180deg); }
   </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center p-4">
+<body class="bg-sky-200 text-slate-800 min-h-screen flex flex-col items-center p-4">
 
-  <!-- 標頭 -->
-  <header class="text-center my-4">
-    <h1 class="text-2xl font-bold text-amber-400">🇵🇭 宿霧一日隱藏任務 🕵️‍♀️</h1>
-    <p class="text-xs text-slate-400 mt-1">「到底誰才是那個怪怪的？」</p>
+  <!-- 像素海島標頭 -->
+  <header class="text-center my-3">
+    <div class="inline-block bg-amber-300 px-3 py-1 pixel-box mb-2">
+      <span class="text-xs text-amber-900 font-bold tracking-widest">ISLAND ADVENTURE</span>
+    </div>
+    <h1 class="text-xl md:text-2xl font-bold text-sky-900 pixel-font-title tracking-wider drop-shadow">CEBU MISSION</h1>
+    <p class="text-base text-sky-800 font-bold mt-1">🏝️ 到底誰才是那個怪怪的？ 🕵️‍♀️</p>
   </header>
 
   <main class="w-full max-w-md flex-1 flex flex-col gap-4">
 
-    <!-- 玩家設定 -->
-    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700">
-      <label class="block text-sm font-medium text-slate-300 mb-1">輸入你的名字：</label>
-      <input type="text" id="playerName" placeholder="例如：小明" 
-        class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-amber-400">
-      
-      <button onclick="drawTasks()" 
-        class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2.5 rounded-lg shadow transition active:scale-95">
-        🎲 抽取 3 個隱藏任務
+    <!-- 1. 大廳 / 房間設定 -->
+    <div id="lobbySection" class="bg-amber-100 p-4 rounded-none pixel-box space-y-3">
+      <div>
+        <label class="block text-sm font-bold text-amber-900 mb-1">🎮 玩家暱稱：</label>
+        <input type="text" id="playerName" placeholder="例如：小明" class="w-full bg-white border-2 border-slate-800 p-2 text-base text-slate-800 focus:outline-none focus:bg-amber-50">
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="createRoom()" class="pixel-btn bg-amber-400 hover:bg-amber-300 text-amber-950 font-bold py-2 text-base">👑 建立大廳</button>
+        <button onclick="showJoinInput()" class="pixel-btn bg-sky-400 hover:bg-sky-300 text-sky-950 font-bold py-2 text-base">🚪 加入房間</button>
+      </div>
+
+      <div id="joinBox" class="hidden space-y-2 pt-2 border-t-2 border-dashed border-slate-400">
+        <input type="text" id="roomCodeInput" placeholder="輸入 4 位數房間碼" class="w-full bg-white border-2 border-slate-800 p-2 text-base text-center uppercase text-sky-900 font-bold tracking-widest focus:outline-none">
+        <button onclick="joinRoom()" class="pixel-btn w-full bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-bold py-2 text-base">連線加入</button>
+      </div>
+
+      <div id="roomStatus" class="hidden text-center text-sm text-emerald-800 font-bold pt-1"></div>
+    </div>
+
+    <!-- 2. 智慧抽卡與設定 -->
+    <div id="drawSection" class="bg-white p-4 rounded-none pixel-box space-y-3">
+      <div class="flex justify-between items-center text-sm font-bold text-slate-700">
+        <span>⚙️ 抽取模式：</span>
+        <select id="drawMode" class="bg-amber-100 border-2 border-slate-800 p-1 text-slate-800 font-bold focus:outline-none">
+          <option value="balanced">⚖️ 各組各抽 1 張 (推薦)</option>
+          <option value="random">🎲 全地圖完全隨機</option>
+        </select>
+      </div>
+
+      <button onclick="drawTasks()" class="pixel-btn w-full bg-orange-400 hover:bg-orange-300 text-slate-950 font-bold py-3 text-lg">
+        🎴 抽取今日 3 大隱藏任務
       </button>
+      <div class="text-xs text-slate-600 text-center font-bold">剩餘免費換卡機會：<span id="swapCount" class="text-rose-600 font-bold text-sm">1</span> 次</div>
     </div>
 
-    <!-- 任務卡片區 -->
-    <div id="cardsContainer" class="hidden flex-col gap-4">
-      <div class="text-xs text-amber-300 text-center font-medium">💡 點擊卡片可翻面／隱藏任務（防偷看）</div>
+    <!-- 3. 防窺任務卡片區 -->
+    <div id="cardsContainer" class="hidden flex-col gap-3">
+      <div class="text-xs text-sky-900 font-bold text-center bg-sky-300/60 py-1 border border-sky-400">💡 點擊卡片翻面／按住檢視（放開隱藏防偷看）</div>
       
-      <!-- 3 張卡片 -->
-      <div id="card1" onclick="toggleFlip(1)" class="perspective-1000 cursor-pointer h-36">
-        <div id="inner1" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-xl shadow-xl">
-          <!-- 正面 -->
-          <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-blue-800 rounded-xl flex flex-col items-center justify-center border border-indigo-400 backface-hidden">
-            <span class="text-2xl mb-1">🔒</span>
-            <span class="font-bold text-indigo-100">任務一（點擊揭曉）</span>
+      <!-- 卡片 1 -->
+      <div id="card1" class="perspective-1000 cursor-pointer h-36">
+        <div id="inner1" onclick="toggleFlip(1)" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
+          <div class="absolute inset-0 bg-sky-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
+            <span class="text-2xl mb-1">🎁</span><span class="font-bold text-sm text-sky-950">任務一（點擊/按住揭曉）</span>
           </div>
-          <!-- 反面 -->
-          <div class="absolute inset-0 bg-slate-800 border border-amber-400/40 rounded-xl p-4 flex flex-col justify-between rotate-y-180 backface-hidden">
-            <span id="cat1" class="text-xs font-bold text-amber-400 uppercase tracking-wider"></span>
-            <p id="text1" class="text-sm font-medium text-slate-100 leading-relaxed"></p>
-            <span class="text-[10px] text-slate-400 text-right">再次點擊隱藏</span>
+          <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
+            <div class="flex justify-between items-center"><span id="cat1" class="text-xs font-bold text-amber-800 bg-amber-200 px-1.5 py-0.5 border border-amber-400"></span><button onclick="swapSingleTask(0, event)" class="pixel-btn text-xs bg-rose-400 text-slate-950 px-2 py-0.5 font-bold">🔄 換這張</button></div>
+            <p id="text1" class="text-sm font-bold text-slate-800 leading-snug"></p>
+            <span class="text-xs text-slate-400 text-right">再次點擊隱藏</span>
           </div>
         </div>
       </div>
 
-      <div id="card2" onclick="toggleFlip(2)" class="perspective-1000 cursor-pointer h-36">
-        <div id="inner2" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-xl shadow-xl">
-          <div class="absolute inset-0 bg-gradient-to-br from-teal-600 to-emerald-800 rounded-xl flex flex-col items-center justify-center border border-teal-400 backface-hidden">
-            <span class="text-2xl mb-1">🔒</span>
-            <span class="font-bold text-teal-100">任務二（點擊揭曉）</span>
+      <!-- 卡片 2 -->
+      <div id="card2" class="perspective-1000 cursor-pointer h-36">
+        <div id="inner2" onclick="toggleFlip(2)" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
+          <div class="absolute inset-0 bg-teal-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
+            <span class="text-2xl mb-1">🎁</span><span class="font-bold text-sm text-teal-950">任務二（點擊/按住揭曉）</span>
           </div>
-          <div class="absolute inset-0 bg-slate-800 border border-amber-400/40 rounded-xl p-4 flex flex-col justify-between rotate-y-180 backface-hidden">
-            <span id="cat2" class="text-xs font-bold text-amber-400 uppercase tracking-wider"></span>
-            <p id="text2" class="text-sm font-medium text-slate-100 leading-relaxed"></p>
-            <span class="text-[10px] text-slate-400 text-right">再次點擊隱藏</span>
+          <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
+            <div class="flex justify-between items-center"><span id="cat2" class="text-xs font-bold text-teal-800 bg-teal-200 px-1.5 py-0.5 border border-teal-400"></span><button onclick="swapSingleTask(1, event)" class="pixel-btn text-xs bg-rose-400 text-slate-950 px-2 py-0.5 font-bold">🔄 換這張</button></div>
+            <p id="text2" class="text-sm font-bold text-slate-800 leading-snug"></p>
+            <span class="text-xs text-slate-400 text-right">再次點擊隱藏</span>
           </div>
         </div>
       </div>
 
-      <div id="card3" onclick="toggleFlip(3)" class="perspective-1000 cursor-pointer h-36">
-        <div id="inner3" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-xl shadow-xl">
-          <div class="absolute inset-0 bg-gradient-to-br from-rose-600 to-pink-800 rounded-xl flex flex-col items-center justify-center border border-rose-400 backface-hidden">
-            <span class="text-2xl mb-1">🔒</span>
-            <span class="font-bold text-rose-100">任務三（點擊揭曉）</span>
+      <!-- 卡片 3 -->
+      <div id="card3" class="perspective-1000 cursor-pointer h-36">
+        <div id="inner3" onclick="toggleFlip(3)" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
+          <div class="absolute inset-0 bg-amber-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
+            <span class="text-2xl mb-1">🎁</span><span class="font-bold text-sm text-amber-950">任務三（點擊/按住揭曉）</span>
           </div>
-          <div class="absolute inset-0 bg-slate-800 border border-amber-400/40 rounded-xl p-4 flex flex-col justify-between rotate-y-180 backface-hidden">
-            <span id="cat3" class="text-xs font-bold text-amber-400 uppercase tracking-wider"></span>
-            <p id="text3" class="text-sm font-medium text-slate-100 leading-relaxed"></p>
-            <span class="text-[10px] text-slate-400 text-right">再次點擊隱藏</span>
+          <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
+            <div class="flex justify-between items-center"><span id="cat3" class="text-xs font-bold text-rose-800 bg-rose-200 px-1.5 py-0.5 border border-rose-400"></span><button onclick="swapSingleTask(2, event)" class="pixel-btn text-xs bg-rose-400 text-slate-950 px-2 py-0.5 font-bold">🔄 換這張</button></div>
+            <p id="text3" class="text-sm font-bold text-slate-800 leading-snug"></p>
+            <span class="text-xs text-slate-400 text-right">再次點擊隱藏</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 懷疑筆記本 -->
-    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700 mt-2">
-      <h2 class="text-sm font-bold text-amber-400 mb-2">🕵️‍♂️ 怪怪觀察筆記（只有你看得到）</h2>
-      <textarea id="notes" placeholder="記錄你覺得誰剛剛怪怪的、做了什麼事..." 
-        class="w-full h-24 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400 resize-none"></textarea>
+    <!-- 4. 神祕筆記本 -->
+    <div class="bg-amber-100 p-4 rounded-none pixel-box space-y-2">
+      <h2 class="text-sm font-bold text-amber-900 flex justify-between items-center">
+        <span>🕵️‍♂️ 懷疑筆記本 (極密)</span>
+        <span class="text-xs text-amber-700 font-normal">僅存於本機</span>
+      </h2>
+      <textarea id="notes" placeholder="記錄你覺得誰剛剛怪怪的、做了什麼事（晚餐揭曉指認用）..." class="w-full h-20 bg-white border-2 border-slate-800 p-2 text-sm text-slate-800 focus:outline-none focus:bg-amber-50 resize-none"></textarea>
+    </div>
+
+    <!-- 5. 晚餐揭曉區 -->
+    <div class="bg-white p-4 rounded-none pixel-box space-y-3">
+      <h2 class="text-sm font-bold text-slate-800">🌙 晚餐大揭曉 & 結算</h2>
+      <button onclick="revealAllMissions()" class="pixel-btn w-full bg-rose-500 hover:bg-rose-400 text-white font-bold py-2.5 text-base">📢 晚餐一鍵揭曉所有人任務</button>
+      <div id="revealResultArea" class="hidden bg-amber-50 p-3 text-xs space-y-2 border-2 border-slate-800 max-h-48 overflow-y-auto"></div>
     </div>
 
   </main>
 
   <script>
-    const allTasks = [
-      { cat: "🚐 移動組", text: "1. 安全帶糾察隊：一上車不管坐哪裡，一定要轉頭溫柔提醒大家：「安全帶要繫喔，宿務抓很嚴。」整天講滿 3 次。" },
-      { cat: "🚐 移動組", text: "2. 窗邊沉思者：坐車時故意把額頭靠在車窗玻璃上維持 30 秒，假裝在拍文青 MV。" },
-      { cat: "🚐 移動組", text: "3. 假裝暈車：問旁邊的人有沒有綠油精或薄荷棒，1 分鐘後恢復正常，整天演 2 次。" },
-      { cat: "🚐 移動組", text: "4. 路況分析師：只要一煞車就看著前面搖頭說：「宿務這條路塞車真的無解。」整天 3 次。" },
-      { cat: "🚐 移動組", text: "5. 時間確認狂：每隔兩三小時問身邊的人現在幾點，不能看自己手機，要問滿 3 次。" },
-      { cat: "🚐 移動組", text: "6. 冷氣狂熱者：一上車就調出風口，嚴肅問大家：「你那邊有風嗎？會不會熱？」整天至少 3 次。" },
-      { cat: "🚐 移動組", text: "7. 宿務地理大師：車開到新地方時看著窗外點頭說：「這裡如果我沒記錯，應該是舊城區。」講滿 3 次。" },
-      { cat: "🚐 移動組", text: "8. 方向盤棋手：遇到紅燈雙手托腮對窗外長嘆：「這就是人生啊...」至少讓 1 人聽到，整天 2 次。" },
-      { cat: "🚐 移動組", text: "9. 點名狂人：景點結束上車後大喊：「來！報數！」要求大家報數，至少 2 次。" },
-      { cat: "🚐 移動組", text: "10. 藍牙 DJ：車上放音樂搶在副歌第一句大聲跟唱三個字，立刻假裝忘詞卡住，至少 3 次。" },
-      { cat: "🌊 海灘組", text: "11. 檢查大師：準備下水或穿救生衣時走去檢查身邊的人說：「這樣比較安全。」至少 2 次。" },
-      { cat: "🌊 海灘組", text: "12. 海水鑑價師：碰到海水用手指沾一下認真說：「今天的海水分外地鹹耶。」講 3 次。" },
-      { cat: "🌊 海灘組", text: "13. 潑水警告：腳踩海水時用腳尖踢水到朋友腳邊，對方看你時一臉無辜：「是浪打過來的。」" },
-      { cat: "🌊 海灘組", text: "14. 沙灘漫步：在沙灘走路只踩前面那個人的腳印，對方回頭立刻停下來微笑。" },
-      { cat: "🌊 海灘組", text: "15. 吹風少年：吹到海風時閉眼深呼吸感嘆：「這就是度假的味道啊...」講滿 3 次。" },
-      { cat: "🌊 海灘組", text: "16. 人魚傳說：下水或上岸時看著自己的腿說：「我上輩子一定是條魚。」講 3 次。" },
-      { cat: "🌊 海灘組", text: "17. 海浪法師：海浪衝到腳邊時閉眼、雙手合十深呼吸 3 秒，假裝吸收海洋能量。" },
-      { cat: "🌊 海灘組", text: "18. 拖鞋糾察隊：關心身邊人的腳：「你鞋子有沒有進沙？要不要我幫你吹一下？」至少問 3 人。" },
-      { cat: "🌊 海灘組", text: "19. 沙灘詩人：踩著沙子深情說：「你不覺得...宿務的沙子踩起來很像奶粉嗎？」" },
-      { cat: "🌊 海灘組", text: "20. 水性宣示：看到海時拍胸口說：「不瞞你說，我以前外號叫宿務小白鯊。」講完立刻跳開。" },
-      { cat: "🍽️ 餐廳組", text: "21. 遞紙巾達人：上菜或有人手沾到時，主動遞衛生紙，整天服務 5 次。" },
-      { cat: "🍽️ 餐廳組", text: "22. 美食讚賞家：每道菜吃第一口時點頭小聲說：「嗯，這個點對了。」" },
-      { cat: "🍽️ 餐廳組", text: "23. 杯墊強迫症：看到朋友的杯子沒放在杯墊/衛生紙上，默默幫他移過去。" },
-      { cat: "🍽️ 餐廳組", text: "24. 剩最後一口：大盤食物剩最後一口時熱情分配：「這口給你，這精華。」" },
-      { cat: "🍽️ 餐廳組", text: "25. 吸管糾正：喝飲料不拿杯子，只用嘴巴湊過去咬吸管，整晚至少 3 次。" },
-      { cat: "🍽️ 餐廳組", text: "26. 大胃王宣言：每道菜上桌都誇張說：「這盤我一個人就可以倒進嘴裡吃完。」至少 3 道。" },
-      { cat: "🍽️ 餐廳組", text: "27. 芒果乾代言人：吃到芒果相關食物閉眼點頭用英文說：「Oh my god, this is real Cebu!」3 次。" },
-      { cat: "🍽️ 餐廳組", text: "28. 擦手強迫症：吃飯前發給每個人濕紙巾，並看著大家擦完手。" },
-      { cat: "🍽️ 餐廳組", text: "29. 乾杯句點王：大家乾杯時，喝完一定補一句超級冷的冷笑話。" },
-      { cat: "🍽️ 餐廳組", text: "30. 美食攝影師：菜上齊站起來用超刁鑽姿勢拍菜，拍完說：「完美。」再坐下。" },
-      { cat: "🗿 散步組", text: "31. 當地人認證：看到當地人時小聲對朋友說：「你不覺得他長得有點像我認識的某個人嗎？」3 次。" },
-      { cat: "🗿 散步組", text: "32. 台灣比較級：看到建築自然說：「這感覺跟台灣的阿嬤家有點像。」或「長得好像墾丁。」3 次。" },
-      { cat: "🗿 散步組", text: "33. 突然停下：走路途中停下看鞋子假裝鞋帶鬆了，3 秒後繼續走，整天 3 次。" },
-      { cat: "🗿 散步組", text: "34. 走錯路大師：遇到岔路自信帶大家往錯的方向走 5 步，被人發現說：「喔走錯了，是這邊。」" },
-      { cat: "🗿 散步組", text: "35. 店員擊掌：買完東西結帳後自然跟店員碰拳/擊掌並說：「Thank you。」" },
-      { cat: "🗿 散步組", text: "36. 歷史狂熱分子：看古蹟湊近瞇眼說：「嗯...這個石頭至少有三百年歷史。」" },
-      { cat: "🗿 散步組", text: "37. 菲律賓結界：經過便利商店說：「有結界！吸住我了！我進去一下！」讓至少一人跟你進去。" },
-      { cat: "🗿 散步組", text: "38. 國際禮儀大師：拿到找零時雙手接過並誇張地說謝謝。" },
-      { cat: "🗿 散步組", text: "39. 影子殺手：走路故意踩朋友影子，被發現時立刻看天空裝作看小鳥。" },
-      { cat: "🗿 散步組", text: "40. 宿務超模：走到好看背景前把手機交給朋友，立刻擺超浮誇 Vogue 姿勢維持 5 秒。" }
-    ];
+    const taskDatabase = {
+      transport: [
+        { cat: "🚐 移動組", text: "1. 安全帶糾察隊：上車提醒大家：「安全帶要繫喔，宿務抓很嚴。」整天 3 次。" },
+        { cat: "🚐 移動組", text: "2. 窗邊沉思者：坐車把額頭靠在車窗玻璃上維持 30 秒，假裝拍文青 MV。" },
+        { cat: "🚐 移動組", text: "3. 假裝暈車：問旁邊有沒有綠油精或薄荷棒，1 分鐘後恢復正常，整天 2 次。" },
+        { cat: "🚐 移動組", text: "4. 路況分析師：煞車就搖頭說：「宿務這條路塞車真的無解。」整天 3 次。" },
+        { cat: "🚐 移動組", text: "5. 時間確認狂：每隔兩三小時問身邊的人現在幾點，不能看手機，問滿 3 次。" },
+        { cat: "🚐 移動組", text: "6. 冷氣狂熱者：上車調出風口問大家：「你那邊有風嗎？會不會熱？」至少 3 次。" },
+        { cat: "🚐 移動組", text: "7. 宿務地理大師：車開到新地方說：「這裡沒記錯應該是舊城區。」講滿 3 次。" },
+        { cat: "🚐 移動組", text: "8. 方向盤棋手：紅燈雙手托腮對窗外長嘆：「這就是人生啊...」至少 2 次。" },
+        { cat: "🚐 移動組", text: "9. 點名狂人：景點結束上車後大喊：「來！報數！」要求大家報數，至少 2 次。" },
+        { cat: "🚐 移動組", text: "10. 藍牙 DJ：車上放音樂搶在副歌第一句大聲跟唱三個字，立刻假裝忘詞，至少 3 次。" }
+      ],
+      sea: [
+        { cat: "🌊 海灘組", text: "11. 檢查大師：準備下水或穿救生衣時檢查身邊的人說：「這樣比較安全。」至少 2 次。" },
+        { cat: "🌊 海灘組", text: "12. 海水鑑價師：碰到海水用手指沾一下認真說：「今天的海水分外地鹹耶。」講 3 次。" },
+        { cat: "🌊 海灘組", text: "13. 潑水警告：用腳尖踢水到朋友腳邊，對方看你時一臉無辜：「是浪打過來的。」" },
+        { cat: "🌊 海灘組", text: "14. 沙灘漫步：在沙灘走路只踩前面那個人的腳印，對方回頭立刻停下來微笑。" },
+        { cat: "🌊 海灘組", text: "15. 吹風少年：吹到海風時閉眼深呼吸感嘆：「這就是度假的味道啊...」講滿 3 次。" },
+        { cat: "🌊 海灘組", text: "16. 人魚傳說：下水或上岸時看著自己的腿說：「我上輩子一定是條魚。」講 3 次。" },
+        { cat: "🌊 海灘組", text: "17. 海浪法師：海浪衝到腳邊時閉眼雙手合十 3 秒，假裝吸收海洋能量。" },
+        { cat: "🌊 海灘組", text: "18. 拖鞋糾察隊：關心身邊人的腳：「你鞋子有沒有進沙？要不要我幫你吹一下？」至少 3 人。" },
+        { cat: "🌊 海灘組", text: "19. 沙灘詩人：踩著沙子深情說：「你不覺得...宿務的沙子踩起來很像奶粉嗎？」" },
+        { cat: "🌊 海灘組", text: "20. 水性宣示：看到海時拍胸口說：「不瞞你說，我以前外號叫宿務小白鯊。」" }
+      ],
+      foodAndCity: [
+        { cat: "🍽️ 餐廳組", text: "21. 遞紙巾達人：上菜或有人手沾到時，主動遞衛生紙，整天 5 次。" },
+        { cat: "🍽️ 餐廳組", text: "22. 美食讚賞家：每道菜吃第一口點頭小聲說：「嗯，這個點對了。」" },
+        { cat: "🍽️ 餐廳組", text: "23. 杯墊強迫症：看到朋友的杯子沒放在杯墊/衛生紙上，默默幫他移過去。" },
+        { cat: "🍽️ 餐廳組", text: "24. 剩最後一口：大盤食物剩最後一口時熱情分配：「這口給你，這精華。」" },
+        { cat: "🍽️ 餐廳組", text: "25. 吸管糾正：喝飲料不拿杯子，只用嘴巴湊過去咬吸管，整晚至少 3 次。" },
+        { cat: "🍽️ 餐廳組", text: "26. 大胃王宣言：每道菜上桌誇張說：「這盤我一個人就可以倒進嘴裡吃完。」至少 3 道。" },
+        { cat: "🍽️ 餐廳組", text: "27. 芒果乾代言人：吃到芒果相關食物閉眼點頭英文說：「Oh my god, this is real Cebu!」3 次。" },
+        { cat: "🍽️ 餐廳組", text: "28. 擦手強迫症：吃飯前發給每個人濕紙巾，並看著大家擦完手。" },
+        { cat: "🍽️ 餐廳組", text: "29. 乾杯句點王：大家乾杯時，喝完一定補一句超級冷的冷笑話。" },
+        { cat: "🍽️ 餐廳組", text: "30. 美食攝影師：菜上齊站起來用超刁鑽姿勢拍菜，拍完說：「完美。」" },
+        { cat: "🗿 散步組", text: "31. 當地人認證：看到當地人小聲說：「你不覺得他長得有點像我認識的某個人嗎？」3 次。" },
+        { cat: "🗿 散步組", text: "32. 台灣比較級：看到建築自然說：「這感覺跟台灣的阿嬤家有點像。」3 次。" },
+        { cat: "🗿 散步組", text: "33. 突然停下：走路途中停下看鞋子假裝鞋帶鬆了，3 秒後繼續走，整天 3 次。" },
+        { cat: "🗿 散步組", text: "34. 走錯路大師：岔路自信帶大家往錯的方向走 5 步，被發現說：「喔走錯了。」" },
+        { cat: "🗿 散步組", text: "35. 店員擊掌：結帳後自然跟店員碰拳/擊掌並說：「Thank you。」" },
+        { cat: "🗿 散步組", text: "36. 歷史狂熱分子：看古蹟湊近瞇眼說：「嗯...這個石頭至少有三百年歷史。」" },
+        { cat: "🗿 散步組", text: "37. 菲律賓結界：經過超商說：「有結界！吸住我了！」讓至少一人跟你進去。" },
+        { cat: "🗿 散步組", text: "38. 國際禮儀大師：拿到找零時雙手接過並誇張地說謝謝。" },
+        { cat: "🗿 散步組", text: "39. 影子殺手：走路故意踩朋友影子，被發現時看天空裝作看小鳥。" },
+        { cat: "🗿 散步組", text: "40. 宿務超模：走到好看背景前把手機交給朋友，擺超浮誇 Vogue 姿勢 5 秒。" }
+      ]
+    };
 
     let myTasks = [];
+    let swapLeft = 1;
+    let peer = null;
+    let connections = [];
 
-    // 讀取 localStorage 紀錄
     window.onload = () => {
-      const savedName = localStorage.getItem('cebu_player_name');
       const savedTasks = localStorage.getItem('cebu_my_tasks');
       const savedNotes = localStorage.getItem('cebu_notes');
-
-      if (savedName) document.getElementById('playerName').value = savedName;
+      const savedSwap = localStorage.getItem('cebu_swap_left');
+      
       if (savedNotes) document.getElementById('notes').value = savedNotes;
+      if (savedSwap !== null) {
+        swapLeft = parseInt(savedSwap);
+        document.getElementById('swapCount').innerText = swapLeft;
+      }
       if (savedTasks) {
         myTasks = JSON.parse(savedTasks);
         renderTasks();
       }
     };
 
-    // 存筆記
     document.getElementById('notes').addEventListener('input', (e) => {
       localStorage.setItem('cebu_notes', e.target.value);
     });
 
+    function createRoom() {
+      const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+      peer = new Peer('cebu-' + roomCode);
+      peer.on('open', (id) => {
+        document.getElementById('roomStatus').classList.remove('hidden');
+        document.getElementById('roomStatus').innerText = `👑 房間已建立！碼：${roomCode}`;
+      });
+      peer.on('connection', (conn) => connections.push(conn));
+    }
+
+    function showJoinInput() {
+      document.getElementById('joinBox').classList.toggle('hidden');
+    }
+
+    function joinRoom() {
+      const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+      if (!code) return alert('請輸入房間碼！');
+      peer = new Peer();
+      peer.on('open', () => {
+        const conn = peer.connect('cebu-' + code);
+        conn.on('open', () => {
+          connections.push(conn);
+          document.getElementById('roomStatus').classList.remove('hidden');
+          document.getElementById('roomStatus').innerText = `✅ 已連線加入房間！`;
+        });
+      });
+    }
+
     function drawTasks() {
       const name = document.getElementById('playerName').value.trim();
-      if (!name) {
-        alert('請先輸入你的名字喔！');
-        return;
+      if (!name) return alert('請先輸入暱稱！');
+
+      const mode = document.getElementById('drawMode').value;
+      if (mode === 'balanced') {
+        const t1 = taskDatabase.transport[Math.floor(Math.random() * taskDatabase.transport.length)];
+        const t2 = taskDatabase.sea[Math.floor(Math.random() * taskDatabase.sea.length)];
+        const t3 = taskDatabase.foodAndCity[Math.floor(Math.random() * taskDatabase.foodAndCity.length)];
+        myTasks = [t1, t2, t3];
+      } else {
+        const all = [...taskDatabase.transport, ...taskDatabase.sea, ...taskDatabase.foodAndCity];
+        myTasks = all.sort(() => 0.5 - Math.random()).slice(0, 3);
       }
-
-      if (myTasks.length > 0 && !confirm('重新抽取會覆蓋原本的任務，確定要重抽嗎？')) {
-        return;
-      }
-
-      localStorage.setItem('cebu_player_name', name);
-
-      // 隨機洗牌抽 3 張
-      const shuffled = [...allTasks].sort(() => 0.5 - Math.random());
-      myTasks = shuffled.slice(0, 3);
 
       localStorage.setItem('cebu_my_tasks', JSON.stringify(myTasks));
+      renderTasks();
+    }
+
+    function swapSingleTask(index, event) {
+      event.stopPropagation();
+      if (swapLeft <= 0) return alert('你的換卡機會已經用完囉！');
+      
+      const all = [...taskDatabase.transport, ...taskDatabase.sea, ...taskDatabase.foodAndCity];
+      myTasks[index] = all[Math.floor(Math.random() * all.length)];
+      swapLeft--;
+      
+      localStorage.setItem('cebu_swap_left', swapLeft);
+      localStorage.setItem('cebu_my_tasks', JSON.stringify(myTasks));
+      document.getElementById('swapCount').innerText = swapLeft;
       renderTasks();
     }
 
     function renderTasks() {
       document.getElementById('cardsContainer').classList.remove('hidden');
       document.getElementById('cardsContainer').classList.add('flex');
-
       myTasks.forEach((t, i) => {
         const idx = i + 1;
         document.getElementById(`cat${idx}`).innerText = t.cat;
@@ -191,8 +302,18 @@
     }
 
     function toggleFlip(index) {
-      const inner = document.getElementById(`inner${index}`);
-      inner.classList.toggle('rotate-y-180');
+      document.getElementById(`inner${index}`).classList.toggle('rotate-y-180');
+    }
+
+    function revealAllMissions() {
+      const name = document.getElementById('playerName').value.trim() || '玩家';
+      const payload = { type: 'reveal', name, tasks: myTasks };
+      
+      const area = document.getElementById('revealResultArea');
+      area.classList.remove('hidden');
+      area.innerHTML += `<div class="p-1.5 border-b border-amber-300"><b class="text-rose-700">${name}</b> 的任務：<br>${myTasks.map(t=>t.text).join('<br>')}</div>`;
+
+      connections.forEach(c => c.send(payload));
     }
   </script>
 </body>

@@ -41,8 +41,11 @@
     <!-- 1. 玩家設定 -->
     <div class="bg-amber-100 p-4 rounded-none pixel-box space-y-3">
       <div>
-        <label class="block text-xs font-bold text-amber-900 mb-1">🎮 你的暱稱：</label>
-        <input type="text" id="playerName" placeholder="例如：小明" onchange="savePlayerInfo()" class="w-full bg-white border-2 border-slate-800 p-1.5 text-base text-slate-800 focus:outline-none">
+        <label class="block text-xs font-bold text-amber-900 mb-1">🎮 你的暱稱 (確認後即鎖定)：</label>
+        <div class="flex gap-2">
+          <input type="text" id="playerName" placeholder="例如：小明" class="w-full bg-white border-2 border-slate-800 p-1.5 text-base text-slate-800 focus:outline-none disabled:bg-slate-200 disabled:text-slate-600 font-bold">
+          <button id="lockNameBtn" onclick="confirmAndLockName()" class="pixel-btn bg-sky-400 hover:bg-sky-300 text-slate-950 px-3 py-1 font-bold whitespace-nowrap text-xs">🔒 鎖定暱稱</button>
+        </div>
       </div>
 
       <button id="drawBtn" onclick="drawThreeCandidates()" class="pixel-btn w-full bg-orange-400 hover:bg-orange-300 text-slate-950 font-bold py-2.5 text-base">
@@ -254,7 +257,10 @@
       const savedNotes = localStorage.getItem('cebu_notes');
       const savedName = localStorage.getItem('cebu_player_name');
       
-      if (savedName) document.getElementById('playerName').value = savedName;
+      if (savedName) {
+        document.getElementById('playerName').value = savedName;
+        lockNameInput(true);
+      }
       if (savedNotes) document.getElementById('notes').value = savedNotes;
 
       if (savedSelected) {
@@ -268,12 +274,11 @@
         disableDrawBtn('今日已抽牌');
       }
 
-      // 監聽 Firebase 即時同步全團進度與自己的打勾狀態
+      // 監聽 Firebase 即時同步全團進度
       progressRef.on('value', (snapshot) => {
         const data = snapshot.val() || {};
         renderGroupProgress(data);
 
-        // 如果目前使用者有輸入名字，自動從 Firebase 讀取打勾狀態恢復
         const name = document.getElementById('playerName').value.trim();
         if (name && data[name] && data[name].checks) {
           const checks = data[name].checks;
@@ -287,10 +292,29 @@
       });
     };
 
-    function savePlayerInfo() {
-      const name = document.getElementById('playerName').value.trim();
-      if (name) localStorage.setItem('cebu_player_name', name);
+    function confirmAndLockName() {
+      const input = document.getElementById('playerName');
+      const name = input.value.trim();
+      if (!name) return alert('請先輸入暱稱！');
+      
+      localStorage.setItem('cebu_player_name', name);
+      lockNameInput(true);
+      alert(`暱稱已成功鎖定為「${name}」！`);
       updateCheckProgress();
+    }
+
+    function lockNameInput(isLocked) {
+      const input = document.getElementById('playerName');
+      const btn = document.getElementById('lockNameBtn');
+      if (isLocked) {
+        input.disabled = true;
+        btn.disabled = true;
+        btn.innerText = '🔒 已鎖定';
+      } else {
+        input.disabled = false;
+        btn.disabled = false;
+        btn.innerText = '🔒 鎖定暱稱';
+      }
     }
 
     document.getElementById('notes').addEventListener('input', (e) => {
@@ -305,9 +329,10 @@
 
     function drawThreeCandidates() {
       const name = document.getElementById('playerName').value.trim();
-      if (!name) return alert('請先輸入「暱稱」喔！');
+      if (!name) return alert('請先輸入並鎖定「暱稱」喔！');
       
-      savePlayerInfo();
+      lockNameInput(true);
+      localStorage.setItem('cebu_player_name', name);
 
       if (selectedTask || localStorage.getItem('cebu_candidates')) {
         return alert('今天已經取得過 3 大任務囉！若要重新抽取請於晚餐後按「重置準備下一天任務」。');
@@ -384,7 +409,6 @@
       }
       document.getElementById('stepCounterText').innerText = `進度: ${count}/4`;
 
-      // 直接同步打勾資料到 Firebase
       const name = document.getElementById('playerName').value.trim();
       if (name) {
         progressRef.child(name).set({
@@ -412,7 +436,7 @@
       }
 
       container.innerHTML = keys.map(name => {
-        const val = data[name].progress;
+        const val = data[name].progress || "0/4";
         const isDone = val === '4/4';
         return `
           <div class="flex justify-between items-center bg-sky-50 p-1.5 border border-sky-200 font-bold">
@@ -433,7 +457,7 @@
     }
 
     function resetDay() {
-      if (confirm('確定要重置並準備下一天的任務嗎？')) {
+      if (confirm('確定要重置並準備下一天的任務嗎？（這將會解鎖暱稱並清除今日紀錄）')) {
         const name = document.getElementById('playerName').value.trim();
         if (name) {
           progressRef.child(name).remove();
@@ -442,6 +466,11 @@
         candidateTasks = [];
         localStorage.removeItem('cebu_selected_task');
         localStorage.removeItem('cebu_candidates');
+        localStorage.removeItem('cebu_player_name');
+        
+        document.getElementById('playerName').value = '';
+        lockNameInput(false);
+
         resetChecks();
         
         document.getElementById('candidateSection').classList.add('hidden');
@@ -454,7 +483,7 @@
         btn.disabled = false;
         btn.innerText = '🎴 取得今日 3 大任務 (每日限 1 次)';
 
-        alert('已重置！明天請重新點擊抽取下一天任務。');
+        alert('已成功重置！明天請輸入暱稱並重新抽取下一天的任務。');
       }
     }
 

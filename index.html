@@ -3,34 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🇵🇭 宿霧隱藏任務 👾 Pixel Island</title>
+  <title>🇵🇭 宿霧隱藏任務 👾 Pixel Island (即時連線版)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  
+  <!-- 引入 Firebase 相容 SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
   <style>
-    body {
-      font-family: 'VT323', monospace;
-      letter-spacing: 0.5px;
-    }
-    .pixel-font-title {
-      font-family: 'Press Start 2P', cursive;
-    }
-    .pixel-box {
-      border: 4px solid #1e293b;
-      box-shadow: 4px 4px 0px #1e293b;
-    }
-    .pixel-box-sm {
-      border: 3px solid #1e293b;
-      box-shadow: 3px 3px 0px #1e293b;
-    }
-    .pixel-btn {
-      border: 3px solid #1e293b;
-      box-shadow: 0px 4px 0px #1e293b;
-      transition: all 0.1s ease;
-    }
-    .pixel-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0px 0px 0px #1e293b;
-    }
+    body { font-family: 'VT323', monospace; letter-spacing: 0.5px; }
+    .pixel-font-title { font-family: 'Press Start 2P', cursive; }
+    .pixel-box { border: 4px solid #1e293b; box-shadow: 4px 4px 0px #1e293b; }
+    .pixel-box-sm { border: 3px solid #1e293b; box-shadow: 3px 3px 0px #1e293b; }
+    .pixel-btn { border: 3px solid #1e293b; box-shadow: 0px 4px 0px #1e293b; transition: all 0.1s ease; }
+    .pixel-btn:active { transform: translateY(4px); box-shadow: 0px 0px 0px #1e293b; }
     .perspective-1000 { perspective: 1000px; }
     .transform-style-3d { transform-style: preserve-3d; }
     .backface-hidden { backface-visibility: hidden; }
@@ -45,7 +32,7 @@
       <span class="text-xs text-amber-900 font-bold tracking-widest">CEBU TRIP 2026</span>
     </div>
     <h1 class="text-xl md:text-2xl font-bold text-sky-900 pixel-font-title tracking-wider drop-shadow">CEBU MISSION</h1>
-    <p class="text-base text-sky-800 font-bold mt-1">🏝️ 8人專屬・即時公開進度陣營戰 🕵️‍♀️</p>
+    <p class="text-base text-sky-800 font-bold mt-1">🏝️ 8人專屬・網頁即時同步進度戰 🕵️‍♀️</p>
   </header>
 
   <main class="w-full max-w-md flex-1 flex flex-col gap-4">
@@ -54,7 +41,7 @@
     <div class="bg-amber-100 p-4 rounded-none pixel-box space-y-3">
       <div class="grid grid-cols-3 gap-2">
         <div class="col-span-2">
-          <label class="block text-xs font-bold text-amber-900 mb-1">🎮 暱稱：</label>
+          <label class="block text-xs font-bold text-amber-900 mb-1">🎮 你的暱稱：</label>
           <input type="text" id="playerName" placeholder="例如：小明" class="w-full bg-white border-2 border-slate-800 p-1.5 text-base text-slate-800 focus:outline-none">
         </div>
         <div>
@@ -138,7 +125,7 @@
     <!-- 3. 已確定的今日任務卡 (含 4 次打勾追蹤) -->
     <div id="finalSection" class="hidden flex-col gap-2">
       <div class="text-xs text-emerald-900 font-bold text-center bg-emerald-300 py-1 border-2 border-slate-800 pixel-box-sm">
-        🔒 今日任務已鎖定（每完成 1 次請點下面打勾）
+        🔒 今日任務已鎖定（打勾後，全團網頁會即時同步你的進度！）
       </div>
 
       <div class="perspective-1000 cursor-pointer h-44">
@@ -170,20 +157,15 @@
       </div>
     </div>
 
-    <!-- 4. 8 人公開進度雷達看板 -->
+    <!-- 4. 全團網頁即時同步雷達看板 -->
     <div class="bg-sky-100 p-4 rounded-none pixel-box space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-sm font-bold text-sky-900">📊 全團 8 人公開進度看板</h2>
-        <button onclick="copyMyStatus()" class="pixel-btn text-xs bg-amber-300 hover:bg-amber-200 text-slate-900 px-2 py-1 font-bold">📋 複製我的進度碼</button>
+        <h2 class="text-sm font-bold text-sky-900">📡 全團網頁即時進度雷達</h2>
+        <span class="text-xs text-emerald-700 bg-emerald-100 px-2 py-0.5 border border-emerald-400 font-bold">🟢 連線中</span>
       </div>
 
       <div id="groupProgressList" class="bg-white p-2 border-2 border-slate-800 text-xs space-y-1.5 max-h-48 overflow-y-auto">
-        <div class="text-slate-400 text-center py-2 font-bold">尚無其他人進度，點擊下方按鈕貼上夥伴的進度碼！</div>
-      </div>
-
-      <div class="flex gap-2">
-        <input type="text" id="importCodeInput" placeholder="貼上 LINE 群裡的進度碼" class="flex-1 bg-white border-2 border-slate-800 p-1 text-xs focus:outline-none">
-        <button onclick="importStatus()" class="pixel-btn bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-2 py-1 text-xs font-bold">📥 匯入</button>
+        <div class="text-slate-400 text-center py-2 font-bold">載入連線中或尚未有人打勾進度...</div>
       </div>
     </div>
 
@@ -208,6 +190,25 @@
   </main>
 
   <script>
+    // 你的專屬 Firebase 金鑰（已帶入你的專案 superno8）
+    const firebaseConfig = {
+      apiKey: "AIzaSyA1h6WBX5ETAiNLIAoc1rOm-I9NOyWzjuw",
+      authDomain: "superno8.firebaseapp.com",
+      projectId: "superno8",
+      storageBucket: "superno8.firebasestorage.app",
+      messagingSenderId: "646592629398",
+      appId: "1:646592629398:web:c41844bbc7c71f1965d0b7",
+      measurementId: "G-WGYJ1C12KQ",
+      databaseURL: "https://superno8-default-rtdb.firebaseio.com"
+    };
+
+    // 初始化 Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const database = firebase.database();
+    const progressRef = database.ref("cebu_game_progress");
+
     const taskDatabase = [
       { cat: "🚐 移動組", text: "1. 安全帶糾察隊：一上車轉頭提醒大家：「安全帶要繫喔，宿務抓很嚴。」講滿 4 次。" },
       { cat: "🚐 移動組", text: "2. 假裝暈車：車子行駛時問身邊的人：「你有沒有綠油精或薄荷棒？我好像有點暈。」問滿 4 次。" },
@@ -253,25 +254,28 @@
 
     let candidateTasks = [];
     let selectedTask = null;
-    let groupStatusMap = {};
 
     window.onload = () => {
       const savedSelected = localStorage.getItem('cebu_selected_task');
       const savedNotes = localStorage.getItem('cebu_notes');
       const savedName = localStorage.getItem('cebu_player_name');
       const savedNo = localStorage.getItem('cebu_player_no');
-      const savedGroup = localStorage.getItem('cebu_group_status');
       
       if (savedName) document.getElementById('playerName').value = savedName;
       if (savedNo) document.getElementById('playerNo').value = savedNo;
       if (savedNotes) document.getElementById('notes').value = savedNotes;
-      if (savedGroup) { groupStatusMap = JSON.parse(savedGroup); renderGroupProgress(); }
 
       if (savedSelected) {
         selectedTask = JSON.parse(savedSelected);
         showFinalTask();
         loadChecks();
       }
+
+      // 監聽全團進度（即時連線）
+      progressRef.on('value', (snapshot) => {
+        const data = snapshot.val() || {};
+        renderGroupProgress(data);
+      });
     };
 
     document.getElementById('notes').addEventListener('input', (e) => {
@@ -346,7 +350,7 @@
       }
       document.getElementById('stepCounterText').innerText = `進度: ${count}/4`;
       
-      // 儲存狀態
+      // 儲存本地打勾狀態
       const checks = [
         document.getElementById('chk1').checked,
         document.getElementById('chk2').checked,
@@ -355,12 +359,13 @@
       ];
       localStorage.setItem('cebu_task_checks', JSON.stringify(checks));
 
-      // 同步更新自己的進度到本地看板
+      // 即時同步至 Firebase 資料庫 (所有人畫面上會直接變更)
       const name = document.getElementById('playerName').value.trim();
       if (name) {
-        groupStatusMap[name] = `${count}/4`;
-        localStorage.setItem('cebu_group_status', JSON.stringify(groupStatusMap));
-        renderGroupProgress();
+        progressRef.child(name).set({
+          progress: `${count}/4`,
+          updatedAt: Date.now()
+        });
       }
     }
 
@@ -383,48 +388,23 @@
       updateCheckProgress();
     }
 
-    function copyMyStatus() {
-      const name = document.getElementById('playerName').value.trim() || '無名氏';
-      let count = 0;
-      for (let i = 1; i <= 4; i++) {
-        if (document.getElementById(`chk${i}`).checked) count++;
-      }
-      const code = `[CEBU]${name}:${count}/4`;
-
-      navigator.clipboard.writeText(code).then(() => {
-        alert(`已複製你的最新進度碼：${code}\n快貼到 LINE 群組更新給大家看吧！`);
-      }).catch(() => {
-        prompt('請手動複製你的進度碼貼到 LINE 群組：', code);
-      });
-    }
-
-    function importStatus() {
-      const input = document.getElementById('importCodeInput').value.trim();
-      if (!input.startsWith('[CEBU]')) return alert('進度碼格式不正確喔！');
-
-      const raw = input.replace('[CEBU]', '');
-      const parts = raw.split(':');
-      if (parts.length === 2) {
-        groupStatusMap[parts[0]] = parts[1];
-        localStorage.setItem('cebu_group_status', JSON.stringify(groupStatusMap));
-        renderGroupProgress();
-        document.getElementById('importCodeInput').value = '';
-      }
-    }
-
-    function renderGroupProgress() {
+    function renderGroupProgress(data) {
       const container = document.getElementById('groupProgressList');
-      const keys = Object.keys(groupStatusMap);
-      if (keys.length === 0) return;
+      const keys = Object.keys(data);
+      
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="text-slate-400 text-center py-2 font-bold">尚無玩家連線打勾...</div>`;
+        return;
+      }
 
       container.innerHTML = keys.map(name => {
-        const val = groupStatusMap[name];
+        const val = data[name].progress;
         const isDone = val === '4/4';
         return `
           <div class="flex justify-between items-center bg-sky-50 p-1.5 border border-sky-200 font-bold">
             <span class="text-sky-900">👤 ${name}</span>
             <span class="${isDone ? 'text-emerald-600 font-extrabold' : 'text-amber-600'}">
-              ${isDone ? '🎉 已完成 (4/4)' : '⏳ 進度: ' + val}
+              ${isDone ? '🎉 任務達成 (4/4)' : '⏳ 進度: ' + val}
             </span>
           </div>
         `;

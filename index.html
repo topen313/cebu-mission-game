@@ -45,39 +45,54 @@
       <span class="text-xs text-amber-900 font-bold tracking-widest">CEBU TRIP 2026</span>
     </div>
     <h1 class="text-xl md:text-2xl font-bold text-sky-900 pixel-font-title tracking-wider drop-shadow">CEBU MISSION</h1>
-    <p class="text-base text-sky-800 font-bold mt-1">🏝️ 到底誰才是那個怪怪的？ 🕵️‍♀️</p>
+    <p class="text-base text-sky-800 font-bold mt-1">🏝️ 8人專屬・即時公開進度陣營戰 🕵️‍♀️</p>
   </header>
 
   <main class="w-full max-w-md flex-1 flex flex-col gap-4">
 
-    <!-- 1. 玩家暱稱與抽卡按鈕 -->
+    <!-- 1. 玩家設定 -->
     <div class="bg-amber-100 p-4 rounded-none pixel-box space-y-3">
-      <div>
-        <label class="block text-sm font-bold text-amber-900 mb-1">🎮 你的暱稱：</label>
-        <input type="text" id="playerName" placeholder="例如：小明" class="w-full bg-white border-2 border-slate-800 p-2 text-base text-slate-800 focus:outline-none focus:bg-amber-50">
+      <div class="grid grid-cols-3 gap-2">
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-amber-900 mb-1">🎮 暱稱：</label>
+          <input type="text" id="playerName" placeholder="例如：小明" class="w-full bg-white border-2 border-slate-800 p-1.5 text-base text-slate-800 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-amber-900 mb-1">🔢 玩家編號：</label>
+          <select id="playerNo" class="w-full bg-white border-2 border-slate-800 p-1.5 text-base font-bold text-slate-800 focus:outline-none">
+            <option value="1">玩家 1</option>
+            <option value="2">玩家 2</option>
+            <option value="3">玩家 3</option>
+            <option value="4">玩家 4</option>
+            <option value="5">玩家 5</option>
+            <option value="6">玩家 6</option>
+            <option value="7">玩家 7</option>
+            <option value="8">玩家 8</option>
+          </select>
+        </div>
       </div>
 
-      <button id="drawBtn" onclick="drawThreeCandidates()" class="pixel-btn w-full bg-orange-400 hover:bg-orange-300 text-slate-950 font-bold py-3 text-lg">
-        🎴 隨機抽取 3 張候選任務
+      <button id="drawBtn" onclick="drawThreeCandidates()" class="pixel-btn w-full bg-orange-400 hover:bg-orange-300 text-slate-950 font-bold py-2.5 text-base">
+        🎴 取得今日不撞牌 3 大任務
       </button>
     </div>
 
     <!-- 2. 3 選 1 候選卡片區 -->
     <div id="candidateSection" class="hidden flex-col gap-3">
-      <div class="text-xs text-amber-900 font-bold text-center bg-amber-300 py-1.5 border-2 border-slate-800 pixel-box-sm">
-        👉 請翻牌預覽，並選擇【1 個】你今天要做出的任務：
+      <div class="text-xs text-amber-900 font-bold text-center bg-amber-300 py-1 border-2 border-slate-800 pixel-box-sm">
+        👉 點擊翻牌，選擇【1 個】你今天要做出的任務：
       </div>
       
-      <!-- 候選卡 1 -->
-      <div id="card1" class="perspective-1000 cursor-pointer h-36">
+      <!-- 卡片 A -->
+      <div class="perspective-1000 cursor-pointer h-36">
         <div id="inner1" onclick="toggleFlip(1)" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
           <div class="absolute inset-0 bg-sky-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
-            <span class="text-2xl mb-1">❓</span><span class="font-bold text-sm text-sky-950">候選任務 A（點擊翻面）</span>
+            <span class="text-2xl mb-1">❓</span><span class="font-bold text-sm text-sky-950">候選 A（點擊翻面）</span>
           </div>
           <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
             <div class="flex justify-between items-center">
               <span id="cat1" class="text-xs font-bold text-sky-900 bg-sky-200 px-1.5 py-0.5 border border-sky-400"></span>
-              <button onclick="selectTask(0, event)" class="pixel-btn text-xs bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-2 py-1 font-bold">✅ 決定選這張</button>
+              <button onclick="selectTask(0, event)" class="pixel-btn text-xs bg-emerald-400 text-slate-950 px-2 py-1 font-bold">✅ 決定選這張</button>
             </div>
             <p id="text1" class="text-sm font-bold text-slate-800 leading-snug"></p>
             <span class="text-xs text-slate-400 text-right">再次點擊翻回</span>
@@ -85,16 +100,16 @@
         </div>
       </div>
 
-      <!-- 候選卡 2 -->
-      <div id="card2" class="perspective-1000 cursor-pointer h-36">
+      <!-- 卡片 B -->
+      <div class="perspective-1000 cursor-pointer h-36">
         <div id="inner2" onclick="toggleFlip(2)" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
           <div class="absolute inset-0 bg-teal-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
-            <span class="text-2xl mb-1">❓</span><span class="font-bold text-sm text-teal-950">候選任務 B（點擊翻面）</span>
+            <span class="text-2xl mb-1">❓</span><span class="font-bold text-sm text-teal-950">候選 B（點擊翻面）</span>
           </div>
           <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
             <div class="flex justify-between items-center">
               <span id="cat2" class="text-xs font-bold text-teal-900 bg-teal-200 px-1.5 py-0.5 border border-teal-400"></span>
-              <button onclick="selectTask(1, event)" class="pixel-btn text-xs bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-2 py-1 font-bold">✅ 決定選這張</button>
+              <button onclick="selectTask(1, event)" class="pixel-btn text-xs bg-emerald-400 text-slate-950 px-2 py-1 font-bold">✅ 決定選這張</button>
             </div>
             <p id="text2" class="text-sm font-bold text-slate-800 leading-snug"></p>
             <span class="text-xs text-slate-400 text-right">再次點擊翻回</span>
@@ -102,16 +117,16 @@
         </div>
       </div>
 
-      <!-- 候選卡 3 -->
-      <div id="card3" class="perspective-1000 cursor-pointer h-36">
+      <!-- 卡片 C -->
+      <div class="perspective-1000 cursor-pointer h-36">
         <div id="inner3" onclick="toggleFlip(3)" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
           <div class="absolute inset-0 bg-amber-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
-            <span class="text-2xl mb-1">❓</span><span class="font-bold text-sm text-amber-950">候選任務 C（點擊翻面）</span>
+            <span class="text-2xl mb-1">❓</span><span class="font-bold text-sm text-amber-950">候選 C（點擊翻面）</span>
           </div>
           <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
             <div class="flex justify-between items-center">
               <span id="cat3" class="text-xs font-bold text-amber-900 bg-amber-200 px-1.5 py-0.5 border border-amber-400"></span>
-              <button onclick="selectTask(2, event)" class="pixel-btn text-xs bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-2 py-1 font-bold">✅ 決定選這張</button>
+              <button onclick="selectTask(2, event)" class="pixel-btn text-xs bg-emerald-400 text-slate-950 px-2 py-1 font-bold">✅ 決定選這張</button>
             </div>
             <p id="text3" class="text-sm font-bold text-slate-800 leading-snug"></p>
             <span class="text-xs text-slate-400 text-right">再次點擊翻回</span>
@@ -120,82 +135,142 @@
       </div>
     </div>
 
-    <!-- 3. 已確定的今日唯一任務卡 -->
+    <!-- 3. 已確定的今日任務卡 (含 4 次打勾追蹤) -->
     <div id="finalSection" class="hidden flex-col gap-2">
-      <div class="text-xs text-emerald-900 font-bold text-center bg-emerald-300 py-1.5 border-2 border-slate-800 pixel-box-sm">
-        🔒 今日隱藏任務已鎖定（其餘卡片已拿掉）
+      <div class="text-xs text-emerald-900 font-bold text-center bg-emerald-300 py-1 border-2 border-slate-800 pixel-box-sm">
+        🔒 今日任務已鎖定（每完成 1 次請點下面打勾）
       </div>
 
-      <div class="perspective-1000 cursor-pointer h-36">
+      <div class="perspective-1000 cursor-pointer h-44">
         <div id="innerFinal" onclick="toggleFinalFlip()" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
           <div class="absolute inset-0 bg-emerald-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
             <span class="text-2xl mb-1">🎁</span><span class="font-bold text-base text-emerald-950">今日個人任務（點擊看防窺內容）</span>
           </div>
           <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
-            <span id="finalCat" class="text-xs font-bold text-emerald-800 bg-emerald-200 px-2 py-0.5 border border-emerald-400 w-fit"></span>
-            <p id="finalText" class="text-base font-bold text-slate-800 leading-snug"></p>
+            <div class="flex justify-between items-center">
+              <span id="finalCat" class="text-xs font-bold text-emerald-800 bg-emerald-200 px-2 py-0.5 border border-emerald-400"></span>
+              <span id="stepCounterText" class="text-xs font-bold text-emerald-700 bg-white px-1.5 py-0.5 border border-emerald-400">進度: 0/4</span>
+            </div>
+            <p id="finalText" class="text-sm font-bold text-slate-800 leading-snug"></p>
+
+            <!-- 4 次打勾核取區 -->
+            <div class="bg-amber-100 p-1.5 border border-amber-300 flex justify-between items-center" onclick="event.stopPropagation()">
+              <span class="text-xs font-bold text-amber-900">完成次數打勾：</span>
+              <div class="flex gap-1.5">
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk1" onchange="updateCheckProgress()" class="w-4 h-4">1</label>
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk2" onchange="updateCheckProgress()" class="w-4 h-4">2</label>
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk3" onchange="updateCheckProgress()" class="w-4 h-4">3</label>
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk4" onchange="updateCheckProgress()" class="w-4 h-4">4</label>
+              </div>
+            </div>
+
             <span class="text-xs text-slate-400 text-right">再次點擊隱藏</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 4. 懷疑筆記本 -->
+    <!-- 4. 8 人公開進度雷達看板 -->
+    <div class="bg-sky-100 p-4 rounded-none pixel-box space-y-3">
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-bold text-sky-900">📊 全團 8 人公開進度看板</h2>
+        <button onclick="copyMyStatus()" class="pixel-btn text-xs bg-amber-300 hover:bg-amber-200 text-slate-900 px-2 py-1 font-bold">📋 複製我的進度碼</button>
+      </div>
+
+      <div id="groupProgressList" class="bg-white p-2 border-2 border-slate-800 text-xs space-y-1.5 max-h-48 overflow-y-auto">
+        <div class="text-slate-400 text-center py-2 font-bold">尚無其他人進度，點擊下方按鈕貼上夥伴的進度碼！</div>
+      </div>
+
+      <div class="flex gap-2">
+        <input type="text" id="importCodeInput" placeholder="貼上 LINE 群裡的進度碼" class="flex-1 bg-white border-2 border-slate-800 p-1 text-xs focus:outline-none">
+        <button onclick="importStatus()" class="pixel-btn bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-2 py-1 text-xs font-bold">📥 匯入</button>
+      </div>
+    </div>
+
+    <!-- 5. 懷疑筆記本 -->
     <div class="bg-amber-100 p-4 rounded-none pixel-box space-y-2">
       <h2 class="text-sm font-bold text-amber-900 flex justify-between items-center">
         <span>🕵️‍♂️ 懷疑筆記本 (極密)</span>
-        <span class="text-xs text-amber-700 font-normal">僅存於本機</span>
+        <button onclick="clearNotes()" class="text-xs text-rose-700 font-bold underline">清空筆記</button>
       </h2>
-      <textarea id="notes" placeholder="記錄你覺得誰剛剛怪怪的、做了什麼事（晚餐揭曉指認用）..." class="w-full h-24 bg-white border-2 border-slate-800 p-2 text-sm text-slate-800 focus:outline-none focus:bg-amber-50 resize-none"></textarea>
+      <textarea id="notes" placeholder="記錄你覺得誰剛剛怪怪的、做了什麼事（晚餐揭曉指認用）..." class="w-full h-20 bg-white border-2 border-slate-800 p-2 text-sm text-slate-800 focus:outline-none focus:bg-amber-50 resize-none"></textarea>
     </div>
 
-    <!-- 5. 晚餐揭曉區 -->
+    <!-- 6. 晚餐揭曉區 -->
     <div class="bg-white p-4 rounded-none pixel-box space-y-3">
-      <h2 class="text-sm font-bold text-slate-800">🌙 晚餐大揭曉時間</h2>
+      <h2 class="text-sm font-bold text-slate-800">🌙 晚餐揭曉與重置</h2>
       <button onclick="revealMyMission()" class="pixel-btn w-full bg-rose-500 hover:bg-rose-400 text-white font-bold py-2.5 text-base">📢 揭曉我的任務 (秀給全團看)</button>
       <div id="revealResultArea" class="hidden bg-amber-50 p-3 text-sm space-y-2 border-2 border-slate-800"></div>
+      
+      <button onclick="resetDay()" class="pixel-btn w-full bg-slate-300 hover:bg-slate-200 text-slate-800 font-bold py-1.5 text-xs">☀️ 重置準備下一天任務</button>
     </div>
 
   </main>
 
   <script>
     const taskDatabase = [
-      { cat: "🚐 移動組", text: "1. 安全帶糾察隊：上車提醒大家：「安全帶要繫喔，宿務抓很嚴。」整天 3 次。" },
-      { cat: "🚐 移動組", text: "2. 窗邊沉思者：坐車把額頭靠在車窗玻璃上維持 30 秒，假裝拍文青 MV。" },
-      { cat: "🚐 移動組", text: "3. 假裝暈車：問旁邊有沒有綠油精或薄荷棒，1 分鐘後恢復正常，整天 2 次。" },
-      { cat: "🚐 移動組", text: "4. 路況分析師：煞車就搖頭說：「宿務這條路塞車真的無解。」整天 3 次。" },
-      { cat: "🚐 移動組", text: "5. 時間確認狂：每隔兩三小時問身邊的人現在幾點，不能看手機，問滿 3 次。" },
-      { cat: "🚐 移動組", text: "6. 冷氣狂熱者：上車調出風口問大家：「你那邊有風嗎？會不會熱？」至少 3 次。" },
-      { cat: "🚐 移動組", text: "7. 點名狂人：景點結束上車後大喊：「來！報數！」要求大家報數，至少 2 次。" },
-      { cat: "🌊 海灘組", text: "8. 檢查大師：準備下水或穿救生衣時檢查身邊的人說：「這樣比較安全。」至少 2 次。" },
-      { cat: "🌊 海灘組", text: "9. 海水鑑價師：碰到海水用手指沾一下認真說：「今天的海水分外地鹹耶。」講 3 次。" },
-      { cat: "🌊 海灘組", text: "10. 吹風少年：吹到海風時閉眼深呼吸感嘆：「這就是度假的味道啊...」講滿 3 次。" },
-      { cat: "🌊 海灘組", text: "11. 拖鞋糾察隊：關心身邊人的腳：「你鞋子有沒有進沙？要不要我幫你吹一下？」至少 3 人。" },
-      { cat: "🌊 海灘組", text: "12. 水性宣示：看到海時拍胸口說：「不瞞你說，我以前外號叫宿務小白鯊。」" },
-      { cat: "🍽️ 餐廳組", text: "13. 遞紙巾達人：上菜或有人手沾到時，主動遞衛生紙，整天 5 次。" },
-      { cat: "🍽️ 餐廳組", text: "14. 美食讚賞家：每道菜吃第一口點頭小聲說：「嗯，這個點對了。」" },
-      { cat: "🍽️ 餐廳組", text: "15. 剩最後一口：大盤食物剩最後一口時熱情分配：「這口給你，這精華。」" },
-      { cat: "🍽️ 餐廳組", text: "16. 芒果乾代言人：吃到芒果相關食物閉眼點頭英文說：「Oh my god, this is real Cebu!」3 次。" },
-      { cat: "🍽️ 餐廳組", text: "17. 美食攝影師：菜上齊站起來用超刁鑽姿勢拍菜，拍完說：「完美。」" },
-      { cat: "🗿 散步組", text: "18. 當地人認證：看到當地人小聲說：「你不覺得他長得有點像我認識的某個人嗎？」3 次。" },
-      { cat: "🗿 散步組", text: "19. 台灣比較級：看到建築自然說：「這感覺跟台灣的阿嬤家有點像。」3 次。" },
-      { cat: "🗿 散步組", text: "20. 店員擊掌：結帳後自然跟店員碰拳/擊掌並說：「Thank you。」" }
+      { cat: "🚐 移動組", text: "1. 安全帶糾察隊：一上車轉頭提醒大家：「安全帶要繫喔，宿務抓很嚴。」講滿 4 次。" },
+      { cat: "🚐 移動組", text: "2. 假裝暈車：車子行駛時問身邊的人：「你有沒有綠油精或薄荷棒？我好像有點暈。」問滿 4 次。" },
+      { cat: "🚐 移動組", text: "3. 路況分析師：坐車只要一煞車，就看著前面搖頭說：「宿務這條路塞車真的無解。」感慨 4 次。" },
+      { cat: "🚐 移動組", text: "4. 時間確認狂：每隔一段時間拍身邊的人問：「不好意思，現在幾點了？」不能看手機，問滿 4 次。" },
+      { cat: "🚐 移動組", text: "5. 冷氣狂熱者：一上車調整出風口問大家：「你那邊有風嗎？會不會熱？我幫你調。」問滿 4 次。" },
+      { cat: "🚐 移動組", text: "6. 點名狂人：景點結束重新上車後，大喊：「來！報數！」要求大家報數確認人數，喊滿 4 次。" },
+      { cat: "🚐 移動組", text: "7. 藍牙 DJ：車上放音樂時，搶在副歌第一句大聲跟唱三個字，接著立刻假裝忘詞，演滿 4 次。" },
+      { cat: "🚐 移動組", text: "8. 司機好朋友：上車或下車時，大聲且親切地用英文跟司機說：「Thank you, boss!」說滿 4 次。" },
+      { cat: "🚐 移動組", text: "9. 時間管理大師：車子開動時看手錶或手機，認真跟旁邊說：「預計再 20 分鐘會到下個點。」說滿 4 次。" },
+      { cat: "🚐 移動組", text: "10. 音樂講評家：車上播音樂時，點頭跟旁邊說：「這首歌很經典，我以前很常聽。」講滿 4 次。" },
+      { cat: "🌊 海灘組", text: "11. 檢查大師：準備下水或穿救生衣時，走去「檢查」身邊的人並說：「這樣比較安全。」做滿 4 次。" },
+      { cat: "🌊 海灘組", text: "12. 海水鑑價師：碰到海水時，用手指沾一下認真說：「今天的海水分外地鹹耶。」講滿 4 次。" },
+      { cat: "🌊 海灘組", text: "13. 吹風少年：吹到海風時，閉眼深呼吸感嘆：「這就是度假的味道啊……」感嘆 4 次。" },
+      { cat: "🌊 海灘組", text: "14. 人魚傳說：準備下水或浮潛上岸時，看著自己的腿或腳蹼說：「我上輩子一定是條魚。」講滿 4 次。" },
+      { cat: "🌊 海灘組", text: "15. 海浪法師：海浪衝到腳邊時，閉眼雙手合十、祥和深呼吸 3 秒，假裝吸收海洋能量，做滿 4 次。" },
+      { cat: "🌊 海灘組", text: "16. 防曬狂熱者：拿出防曬用品，問身邊的人：「你要補防曬嗎？這罐很厲害。」問滿 4 次。" },
+      { cat: "🌊 海灘組", text: "17. 補水糾察隊：看到有人在曬太陽，關心說：「菲律賓很熱，你要多補充水分喔。」關心 4 次。" },
+      { cat: "🌊 海灘組", text: "18. 沙灘詩人：踩著沙子深情跟身邊的人說：「你不覺得……宿務的沙子踩起來很像奶粉嗎？」講滿 4 次。" },
+      { cat: "🌊 海灘組", text: "19. 海洋守護者：看到水裡或沙灘有垃圾，撿起來並說：「我們要愛護這片海洋。」做滿 4 次。" },
+      { cat: "🌊 海灘組", text: "20. 水性宣示：看到海時，拍拍胸口跟旁邊的人說：「不瞞你說，我以前外號叫宿務小白鯊。」說滿 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "21. 遞紙巾達人：桌上上菜、上飲料，或有人手沾到東西時，主動遞衛生紙給朋友，做滿 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "22. 美食讚賞家：每一道菜吃第一口時，看著食物點點頭小聲說：「嗯，這個點對了。」點頭 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "23. 剩最後一口：大盤食物剩最後一口時，熱情分配：「這口給你，這精華。」催別人吃掉 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "24. 芒果乾代言人：吃到芒果或芒果乾時，閉眼大力點頭說：「Oh my god, this is real Cebu!」講滿 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "25. 美食攝影師：菜上齊叫大家先別動，站起來用超刁鑽姿勢拍菜，拍完說：「完美。」站拍 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "26. 大胃王宣言：菜上桌時誇張看著食物說：「這盤我一個人就可以倒進嘴裡吃完。」講滿 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "27. 杯墊強迫症：看到朋友的杯子沒有放在杯墊／衛生紙上，默默幫他移過去，移滿 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "28. 乾杯王：只要大家舉杯，不管喝什麼都要大聲喊：「Cheers！為宿務乾杯！」喊滿 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "29. 擦手強迫症：吃飯前拿出濕紙巾或酒精，發給身邊的人並督促：「先擦手再吃。」發滿 4 次。" },
+      { cat: "🍽️ 餐廳組", text: "30. 吸管糾正：喝飲料時故意不用手拿杯子，只用嘴巴湊過去咬吸管，咬滿 4 次。" },
+      { cat: "🗿 散步組", text: "31. 當地人認證：看到當地人時，小聲對朋友說：「你不覺得他長得有點像我認識的某個人嗎？」講滿 4 次。" },
+      { cat: "🗿 散步組", text: "32. 台灣比較級：看到建築自然說：「這感覺跟台灣的阿嬤家有點像。」或「長得好像墾丁。」講滿 4 次。" },
+      { cat: "🗿 散步組", text: "33. 店員擊掌：買完東西結帳後，自然伸拳跟店員碰拳／擊掌，並說：「Thank you。」碰拳 4 次。" },
+      { cat: "🗿 散步組", text: "34. 菲律賓結界：經過便利商店或土產店時說：「有結界！吸住我了！我進去一下！」講滿 4 次。" },
+      { cat: "🗿 散步組", text: "35. 影子殺手：走路時故意踩前面朋友的影子，被回頭發現時立刻看天空裝作在看小鳥，踩滿 4 次。" },
+      { cat: "🗿 散步組", text: "36. 宿務超模：走到好看背景前把手機交給朋友，不說明原因，立刻擺超浮誇 Vogue 姿勢 5 秒，擺滿 4 次。" },
+      { cat: "🗿 散步組", text: "37. 歷史狂熱分子：看到古蹟或舊牆壁時，湊近瞇眼說：「嗯……這個石頭至少有三百年歷史。」講滿 4 次。" },
+      { cat: "🗿 散步組", text: "38. 拍照指導師：幫朋友拍照時，大聲下指令：「來，頭再斜 15 度！完美！」指導 4 次。" },
+      { cat: "🗿 散步組", text: "39. 陽光美男/美女：走在路上伸手擋陽光，看著天空感嘆：「宿務的陽光真的好熱情啊。」感嘆 4 次。" },
+      { cat: "🗿 散步組", text: "40. 同款搜尋器：在土產店看到任何東西，拿起來問朋友：「你不覺得這個很適合你嗎？」問滿 4 次。" }
     ];
 
     let candidateTasks = [];
     let selectedTask = null;
+    let groupStatusMap = {};
 
     window.onload = () => {
       const savedSelected = localStorage.getItem('cebu_selected_task');
       const savedNotes = localStorage.getItem('cebu_notes');
       const savedName = localStorage.getItem('cebu_player_name');
+      const savedNo = localStorage.getItem('cebu_player_no');
+      const savedGroup = localStorage.getItem('cebu_group_status');
       
       if (savedName) document.getElementById('playerName').value = savedName;
+      if (savedNo) document.getElementById('playerNo').value = savedNo;
       if (savedNotes) document.getElementById('notes').value = savedNotes;
+      if (savedGroup) { groupStatusMap = JSON.parse(savedGroup); renderGroupProgress(); }
 
       if (savedSelected) {
         selectedTask = JSON.parse(savedSelected);
         showFinalTask();
+        loadChecks();
       }
     };
 
@@ -206,14 +281,20 @@
     function drawThreeCandidates() {
       const name = document.getElementById('playerName').value.trim();
       if (!name) return alert('請先輸入暱稱喔！');
-      localStorage.setItem('cebu_player_name', name);
-
-      if (selectedTask && !confirm('你已經有選定的任務了，重新抽取會覆蓋原本的任務，確定要重抽嗎？')) return;
-
-      // 隨機取出 3 個不重複的候選任務
-      candidateTasks = [...taskDatabase].sort(() => 0.5 - Math.random()).slice(0, 3);
       
-      // 顯示候選區、隱藏已選區
+      const pNo = parseInt(document.getElementById('playerNo').value);
+      localStorage.setItem('cebu_player_name', name);
+      localStorage.setItem('cebu_player_no', pNo);
+
+      if (selectedTask && !confirm('你已經有選定的任務了，重新抽取會覆蓋原本任務，確定嗎？')) return;
+
+      const offset = (pNo - 1) * 5;
+      candidateTasks = [
+        taskDatabase[offset % taskDatabase.length],
+        taskDatabase[(offset + 1) % taskDatabase.length],
+        taskDatabase[(offset + 2) % taskDatabase.length]
+      ];
+      
       document.getElementById('candidateSection').classList.remove('hidden');
       document.getElementById('candidateSection').classList.add('flex');
       document.getElementById('finalSection').classList.add('hidden');
@@ -223,7 +304,6 @@
         const idx = i + 1;
         document.getElementById(`cat${idx}`).innerText = t.cat;
         document.getElementById(`text${idx}`).innerText = t.text;
-        // 恢復正面
         document.getElementById(`inner${idx}`).classList.remove('rotate-y-180');
       });
     }
@@ -233,11 +313,12 @@
     }
 
     function selectTask(index, event) {
-      event.stopPropagation(); // 阻止觸發卡片翻面
+      event.stopPropagation();
+      if (!confirm('確定要選擇這個任務嗎？選擇後其他卡片將會銷毀！')) return;
+      
       selectedTask = candidateTasks[index];
       localStorage.setItem('cebu_selected_task', JSON.stringify(selectedTask));
-      
-      // 隱藏 3 個候選卡片，呈現最終選定的卡片
+      resetChecks();
       showFinalTask();
     }
 
@@ -251,22 +332,144 @@
       document.getElementById('finalCat').innerText = selectedTask.cat;
       document.getElementById('finalText').innerText = selectedTask.text;
       document.getElementById('innerFinal').classList.remove('rotate-y-180');
+      updateCheckProgress();
     }
 
     function toggleFinalFlip() {
       document.getElementById('innerFinal').classList.toggle('rotate-y-180');
     }
 
+    function updateCheckProgress() {
+      let count = 0;
+      for (let i = 1; i <= 4; i++) {
+        if (document.getElementById(`chk${i}`).checked) count++;
+      }
+      document.getElementById('stepCounterText').innerText = `進度: ${count}/4`;
+      
+      // 儲存狀態
+      const checks = [
+        document.getElementById('chk1').checked,
+        document.getElementById('chk2').checked,
+        document.getElementById('chk3').checked,
+        document.getElementById('chk4').checked
+      ];
+      localStorage.setItem('cebu_task_checks', JSON.stringify(checks));
+
+      // 同步更新自己的進度到本地看板
+      const name = document.getElementById('playerName').value.trim();
+      if (name) {
+        groupStatusMap[name] = `${count}/4`;
+        localStorage.setItem('cebu_group_status', JSON.stringify(groupStatusMap));
+        renderGroupProgress();
+      }
+    }
+
+    function loadChecks() {
+      const saved = localStorage.getItem('cebu_task_checks');
+      if (saved) {
+        const checks = JSON.parse(saved);
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById(`chk${i}`).checked = checks[i - 1] || false;
+        }
+        updateCheckProgress();
+      }
+    }
+
+    function resetChecks() {
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`chk${i}`).checked = false;
+      }
+      localStorage.removeItem('cebu_task_checks');
+      updateCheckProgress();
+    }
+
+    function copyMyStatus() {
+      const name = document.getElementById('playerName').value.trim() || '無名氏';
+      let count = 0;
+      for (let i = 1; i <= 4; i++) {
+        if (document.getElementById(`chk${i}`).checked) count++;
+      }
+      const code = `[CEBU]${name}:${count}/4`;
+
+      navigator.clipboard.writeText(code).then(() => {
+        alert(`已複製你的最新進度碼：${code}\n快貼到 LINE 群組更新給大家看吧！`);
+      }).catch(() => {
+        prompt('請手動複製你的進度碼貼到 LINE 群組：', code);
+      });
+    }
+
+    function importStatus() {
+      const input = document.getElementById('importCodeInput').value.trim();
+      if (!input.startsWith('[CEBU]')) return alert('進度碼格式不正確喔！');
+
+      const raw = input.replace('[CEBU]', '');
+      const parts = raw.split(':');
+      if (parts.length === 2) {
+        groupStatusMap[parts[0]] = parts[1];
+        localStorage.setItem('cebu_group_status', JSON.stringify(groupStatusMap));
+        renderGroupProgress();
+        document.getElementById('importCodeInput').value = '';
+      }
+    }
+
+    function renderGroupProgress() {
+      const container = document.getElementById('groupProgressList');
+      const keys = Object.keys(groupStatusMap);
+      if (keys.length === 0) return;
+
+      container.innerHTML = keys.map(name => {
+        const val = groupStatusMap[name];
+        const isDone = val === '4/4';
+        return `
+          <div class="flex justify-between items-center bg-sky-50 p-1.5 border border-sky-200 font-bold">
+            <span class="text-sky-900">👤 ${name}</span>
+            <span class="${isDone ? 'text-emerald-600 font-extrabold' : 'text-amber-600'}">
+              ${isDone ? '🎉 已完成 (4/4)' : '⏳ 進度: ' + val}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function clearNotes() {
+      if (confirm('確定要清空今天的懷疑筆記嗎？')) {
+        document.getElementById('notes').value = '';
+        localStorage.removeItem('cebu_notes');
+      }
+    }
+
+    function resetDay() {
+      if (confirm('確定要重置並準備下一天的任務嗎？')) {
+        selectedTask = null;
+        localStorage.removeItem('cebu_selected_task');
+        resetChecks();
+        document.getElementById('finalSection').classList.add('hidden');
+        document.getElementById('finalSection').classList.remove('flex');
+        document.getElementById('revealResultArea').classList.add('hidden');
+        alert('已重置！明天請重新選擇玩家編號並抽取任務。');
+      }
+    }
+
     function revealMyMission() {
       if (!selectedTask) return alert('你還沒選擇今天的任務喔！');
       const name = document.getElementById('playerName').value.trim() || '我';
+      let count = 0;
+      for (let i = 1; i <= 4; i++) {
+        if (document.getElementById(`chk${i}`).checked) count++;
+      }
+      
       const area = document.getElementById('revealResultArea');
       area.classList.remove('hidden');
       area.innerHTML = `
         <div class="font-bold text-rose-700 text-base mb-1">🎭 ${name} 的今日隱藏任務：</div>
-        <div class="text-slate-900 font-bold bg-amber-100 p-2 border border-amber-300">
-          <span class="text-xs text-amber-800 bg-amber-200 px-1 py-0.5 border border-amber-400 font-bold mr-1">${selectedTask.cat}</span>
-          ${selectedTask.text}
+        <div class="text-slate-900 font-bold bg-amber-100 p-2 border border-amber-300 space-y-1">
+          <div>
+            <span class="text-xs text-amber-800 bg-amber-200 px-1 py-0.5 border border-amber-400 font-bold mr-1">${selectedTask.cat}</span>
+          </div>
+          <div>${selectedTask.text}</div>
+          <div class="text-xs ${count === 4 ? 'text-emerald-700' : 'text-amber-800'} font-bold border-t border-amber-300 pt-1">
+            最終達成率：${count} / 4 ${count === 4 ? '（完全成功！🎉）' : ''}
+          </div>
         </div>
       `;
     }

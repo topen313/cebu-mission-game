@@ -130,10 +130,10 @@
             <div class="bg-amber-100 p-1.5 border border-amber-300 flex justify-between items-center" onclick="event.stopPropagation()">
               <span class="text-xs font-bold text-amber-900">完成次數打勾：</span>
               <div class="flex gap-1.5">
-                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk1" onchange="updateCheckProgress()" class="w-4 h-4">1</label>
-                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk2" onchange="updateCheckProgress()" class="w-4 h-4">2</label>
-                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk3" onchange="updateCheckProgress()" class="w-4 h-4">3</label>
-                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk4" onchange="updateCheckProgress()" class="w-4 h-4">4</label>
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk1" onchange="handleCheckboxClick(1)" class="w-4 h-4">1</label>
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk2" onchange="handleCheckboxClick(2)" class="w-4 h-4">2</label>
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk3" onchange="handleCheckboxClick(3)" class="w-4 h-4">3</label>
+                <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk4" onchange="handleCheckboxClick(4)" class="w-4 h-4">4</label>
               </div>
             </div>
 
@@ -305,6 +305,8 @@
 
     let candidateTasks = [];
     let selectedTask = null;
+    let nameChangeTimer = null;
+    let oldPlayerName = "";
 
     function hashCode(str) {
       let hash = 0;
@@ -321,7 +323,10 @@
       const savedNotes = localStorage.getItem('cebu_notes');
       const savedName = localStorage.getItem('cebu_player_name');
       
-      if (savedName) document.getElementById('playerName').value = savedName;
+      if (savedName) {
+        document.getElementById('playerName').value = savedName;
+        oldPlayerName = savedName;
+      }
       if (savedNotes) document.getElementById('notes').value = savedNotes;
 
       if (savedSelected) {
@@ -353,8 +358,18 @@
       });
     };
 
-    document.getElementById('playerName').addEventListener('input', (e) => {
-      localStorage.setItem('cebu_player_name', e.target.value.trim());
+    // 修改暱稱：避免打字過程中頻繁建立新使用者
+    document.getElementById('playerName').addEventListener('change', (e) => {
+      const newName = e.target.value.trim();
+      if (!newName) return;
+
+      // 如果名稱改變，將舊資料從 Firebase 移除
+      if (oldPlayerName && oldPlayerName !== newName) {
+        progressRef.child(oldPlayerName).remove();
+      }
+      
+      oldPlayerName = newName;
+      localStorage.setItem('cebu_player_name', newName);
       updateCheckProgress();
     });
 
@@ -435,6 +450,25 @@
 
     function toggleFinalFlip() {
       document.getElementById('innerFinal').classList.toggle('rotate-y-180');
+    }
+
+    // 處理打勾連動：勾選後面自動連帶勾選前面，取消前面自動連帶取消後面
+    function handleCheckboxClick(index) {
+      const isChecked = document.getElementById(`chk${index}`).checked;
+
+      if (isChecked) {
+        // 勾選時，將之前的 checkbox 一併勾選
+        for (let i = 1; i <= index; i++) {
+          document.getElementById(`chk${i}`).checked = true;
+        }
+      } else {
+        // 取消勾選時，將之後的 checkbox 一併取消
+        for (let i = index; i <= 4; i++) {
+          document.getElementById(`chk${i}`).checked = false;
+        }
+      }
+      
+      updateCheckProgress();
     }
 
     function updateCheckProgress() {

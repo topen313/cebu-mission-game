@@ -27,8 +27,15 @@
 </head>
 <body class="bg-sky-200 text-slate-800 min-h-screen flex flex-col items-center p-4">
 
+  <!-- 頂部瀏覽器使用提醒 -->
+  <div class="w-full max-w-md text-center mb-2">
+    <p class="text-xs md:text-sm text-rose-800 bg-amber-300 border-2 border-slate-800 px-3 py-1.5 font-extrabold shadow-sm inline-block">
+      🌟 建議使用外部瀏覽器開啟，勿使用無痕模式以免進度丟失！ 🌟
+    </p>
+  </div>
+
   <!-- 像素海島標頭 -->
-  <header class="text-center my-3">
+  <header class="text-center my-2">
     <div class="inline-block bg-amber-300 px-3 py-1 pixel-box mb-2">
       <span class="text-xs text-amber-900 font-bold tracking-widest">CEBU TRIP 2026</span>
     </div>
@@ -108,23 +115,30 @@
       </div>
     </div>
 
-    <!-- 3. 已確定的今日任務卡 (含 4 次打勾追蹤) -->
+    <!-- 3. 已確定的今日任務卡 (含 4 次打勾與特別規則提示) -->
     <div id="finalSection" class="hidden flex-col gap-2">
       <div class="text-xs text-emerald-900 font-bold text-center bg-emerald-300 py-1 border-2 border-slate-800 pixel-box-sm">
-        🔒 今日任務已鎖定（打勾後，全團網頁會即時同步你的進度！）
+        🔒 今日任務已鎖定（打勾後，全團網頁會即時同步進度！）
       </div>
 
-      <div class="perspective-1000 cursor-pointer h-44">
+      <div class="perspective-1000 cursor-pointer min-h-[220px]">
         <div id="innerFinal" onclick="toggleFinalFlip()" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
-          <div class="absolute inset-0 bg-emerald-400 flex flex-col items-center justify-center border-2 border-white backface-hidden">
-            <span class="text-2xl mb-1">🎁</span><span class="font-bold text-base text-emerald-950">今日個人任務（點擊看防窺內容）</span>
+          <div class="absolute inset-0 bg-emerald-400 flex flex-col items-center justify-center border-2 border-white backface-hidden p-4">
+            <span class="text-3xl mb-1">🎁</span>
+            <span class="font-bold text-base text-emerald-950">今日個人任務（點擊看防窺內容）</span>
           </div>
           <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center mb-1">
               <span id="finalCat" class="text-xs font-bold text-emerald-800 bg-emerald-200 px-2 py-0.5 border border-emerald-400"></span>
               <span id="stepCounterText" class="text-xs font-bold text-emerald-700 bg-white px-1.5 py-0.5 border border-emerald-400">進度: 0/4</span>
             </div>
-            <p id="finalText" class="text-sm font-bold text-slate-800 leading-snug"></p>
+            
+            <p id="finalText" class="text-sm font-bold text-slate-800 leading-snug my-1"></p>
+
+            <!-- ⚠️ 個人任務執行規則提醒 -->
+            <div class="bg-rose-50 border border-rose-300 p-1.5 text-xs text-rose-900 font-bold my-1 text-center">
+              🌟執行任務時需確切執行，如揭曉答案時0人有印象就扣一分🌟
+            </div>
 
             <!-- 4 次打勾核取區 -->
             <div class="bg-amber-100 p-1.5 border border-amber-300 flex justify-between items-center" onclick="event.stopPropagation()">
@@ -137,7 +151,7 @@
               </div>
             </div>
 
-            <span class="text-xs text-slate-400 text-right">再次點擊隱藏</span>
+            <span class="text-[10px] text-slate-400 text-right mt-1">再次點擊隱藏</span>
           </div>
         </div>
       </div>
@@ -305,7 +319,6 @@
 
     let candidateTasks = [];
     let selectedTask = null;
-    let nameChangeTimer = null;
     let oldPlayerName = "";
 
     function hashCode(str) {
@@ -363,7 +376,6 @@
       const newName = e.target.value.trim();
       if (!newName) return;
 
-      // 如果名稱改變，將舊資料從 Firebase 移除
       if (oldPlayerName && oldPlayerName !== newName) {
         progressRef.child(oldPlayerName).remove();
       }
@@ -452,17 +464,14 @@
       document.getElementById('innerFinal').classList.toggle('rotate-y-180');
     }
 
-    // 處理打勾連動：勾選後面自動連帶勾選前面，取消前面自動連帶取消後面
     function handleCheckboxClick(index) {
       const isChecked = document.getElementById(`chk${index}`).checked;
 
       if (isChecked) {
-        // 勾選時，將之前的 checkbox 一併勾選
         for (let i = 1; i <= index; i++) {
           document.getElementById(`chk${i}`).checked = true;
         }
       } else {
-        // 取消勾選時，將之後的 checkbox 一併取消
         for (let i = index; i <= 4; i++) {
           document.getElementById(`chk${i}`).checked = false;
         }

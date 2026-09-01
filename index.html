@@ -135,7 +135,7 @@
             
             <p id="finalText" class="text-sm font-bold text-slate-800 leading-snug my-1"></p>
 
-            <!-- ⚠️ 個人任務執行規則提醒（已修復重疊問題） -->
+            <!-- ⚠️ 個人任務執行規則提醒（防擠壓修復版） -->
             <div class="bg-rose-50 border border-rose-300 p-2 text-xs text-rose-900 font-extrabold my-1.5 text-center leading-relaxed">
               🌟 執行任務時需確切執行，如揭曉答案時 0 人有印象就扣一分 🌟
             </div>
@@ -504,7 +504,7 @@
       for (let i = 1; i <= 4; i++) {
         document.getElementById(`chk${i}`).checked = false;
       }
-      updateCheckProgress();
+      document.getElementById('stepCounterText').innerText = '進度: 0/4';
     }
 
     function renderGroupProgress(data) {
@@ -537,29 +537,37 @@
       }
     }
 
+    // ☀️ 重置今日任務與全團進度紀錄
     function resetDay() {
-      if (confirm('確定要重置並準備下一天的任務嗎？（這將會清除資料庫與今日紀錄）')) {
+      if (confirm('確定要重置並準備下一天的任務嗎？（這將會同步移除全團進度看板上的這項紀錄）')) {
         const name = document.getElementById('playerName').value.trim();
+        
+        // 1. 強制移除 Firebase 上當前玩家的紀錄
         if (name) {
           progressRef.child(name).remove();
         }
+
+        // 2. 清空 LocalStorage 快取
         selectedTask = null;
         candidateTasks = [];
         localStorage.removeItem('cebu_selected_task');
         localStorage.removeItem('cebu_candidates');
 
+        // 3. 重置個人勾選進度 UI
         resetChecks();
         
+        // 4. 隱藏任務面板
         document.getElementById('candidateSection').classList.add('hidden');
         document.getElementById('candidateSection').classList.remove('flex');
         document.getElementById('finalSection').classList.add('hidden');
         document.getElementById('finalSection').classList.remove('flex');
 
+        // 5. 恢復抽取按鈕
         const btn = document.getElementById('drawBtn');
         btn.disabled = false;
         btn.innerText = '🎴 取得今日 3 大任務 (每日限 1 次)';
 
-        alert('已成功重置！明天請重新抽取下一天的任務。');
+        alert('已成功重置！進度看板紀錄已一併清除，明天請重新抽取任務。');
       }
     }
   </script>

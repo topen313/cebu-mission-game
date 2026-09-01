@@ -121,13 +121,13 @@
         🔒 今日任務已鎖定（打勾後，全團網頁會即時同步進度！）
       </div>
 
-      <div class="perspective-1000 cursor-pointer min-h-[220px]">
-        <div id="innerFinal" onclick="toggleFinalFlip()" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
+      <div class="perspective-1000 cursor-pointer min-h-[260px]">
+        <div id="innerFinal" onclick="toggleFinalFlip()" class="relative w-full h-full min-h-[260px] transform-style-3d transition-transform duration-500 rounded-none pixel-box-sm">
           <div class="absolute inset-0 bg-emerald-400 flex flex-col items-center justify-center border-2 border-white backface-hidden p-4">
             <span class="text-3xl mb-1">🎁</span>
             <span class="font-bold text-base text-emerald-950">今日個人任務（點擊看防窺內容）</span>
           </div>
-          <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden">
+          <div class="absolute inset-0 bg-amber-50 p-3 flex flex-col justify-between rotate-y-180 backface-hidden overflow-y-auto">
             <div class="flex justify-between items-center mb-1">
               <span id="finalCat" class="text-xs font-bold text-emerald-800 bg-emerald-200 px-2 py-0.5 border border-emerald-400"></span>
               <span id="stepCounterText" class="text-xs font-bold text-emerald-700 bg-white px-1.5 py-0.5 border border-emerald-400">進度: 0/4</span>
@@ -135,13 +135,13 @@
             
             <p id="finalText" class="text-sm font-bold text-slate-800 leading-snug my-1"></p>
 
-            <!-- ⚠️ 個人任務執行規則提醒 -->
-            <div class="bg-rose-50 border border-rose-300 p-1.5 text-xs text-rose-900 font-bold my-1 text-center">
-              🌟執行任務時需確切執行，如揭曉答案時0人有印象就扣一分🌟
+            <!-- ⚠️ 個人任務執行規則提醒（已修復重疊問題） -->
+            <div class="bg-rose-50 border border-rose-300 p-2 text-xs text-rose-900 font-extrabold my-1.5 text-center leading-relaxed">
+              🌟 執行任務時需確切執行，如揭曉答案時 0 人有印象就扣一分 🌟
             </div>
 
             <!-- 4 次打勾核取區 -->
-            <div class="bg-amber-100 p-1.5 border border-amber-300 flex justify-between items-center" onclick="event.stopPropagation()">
+            <div class="bg-amber-100 p-2 border border-amber-300 flex justify-between items-center" onclick="event.stopPropagation()">
               <span class="text-xs font-bold text-amber-900">完成次數打勾：</span>
               <div class="flex gap-1.5">
                 <label class="flex items-center gap-0.5 text-xs font-bold"><input type="checkbox" id="chk1" onchange="handleCheckboxClick(1)" class="w-4 h-4">1</label>

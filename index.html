@@ -30,7 +30,7 @@
   <!-- 頂部瀏覽器使用提醒 -->
   <div class="w-full max-w-md text-center mb-2">
     <p class="text-xs md:text-sm text-rose-800 bg-amber-300 border-2 border-slate-800 px-3 py-1.5 font-extrabold shadow-sm inline-block">
-      🌟 建議使用外部瀏覽器開啟，勿使用無痕模式以免進度丟失！ 🌟
+      🌟 建議允許推播通知與使用外部瀏覽器，勿用無痕模式！ 🌟
     </p>
   </div>
 
@@ -115,10 +115,10 @@
       </div>
     </div>
 
-    <!-- 3. 已確定的今日任務卡 (含 4 次打勾與特別規則提示) -->
+    <!-- 3. 已確定的今日任務卡 -->
     <div id="finalSection" class="hidden flex-col gap-2">
       <div class="text-xs text-emerald-900 font-bold text-center bg-emerald-300 py-1 border-2 border-slate-800 pixel-box-sm">
-        🔒 今日任務已鎖定（打勾後，全團網頁會即時同步進度！）
+        🔒 今日任務已鎖定（打勾後，全團網頁會即時同步與推播通知！）
       </div>
 
       <div class="perspective-1000 cursor-pointer min-h-[260px]">
@@ -135,7 +135,6 @@
             
             <p id="finalText" class="text-sm font-bold text-slate-800 leading-snug my-1"></p>
 
-            <!-- ⚠️ 個人任務執行規則提醒（防擠壓修復版） -->
             <div class="bg-rose-50 border border-rose-300 p-2 text-xs text-rose-900 font-extrabold my-1.5 text-center leading-relaxed">
               🌟 執行任務時需確切執行，如揭曉答案時 0 人有印象就扣一分 🌟
             </div>
@@ -274,7 +273,7 @@
     const database = firebase.database();
     const progressRef = database.ref("cebu_game_progress");
 
-        const taskDatabase = [
+    const taskDatabase = [
       { cat: "🚐 移動組", text: "1. 安全帶糾察隊：一上車轉頭提醒大家：「安全帶要繫喔，宿霧抓很嚴。」講滿 4 次。" },
       { cat: "🚐 移動組", text: "2. 假裝暈車：車子行駛時問身邊的人：「你有沒有綠油精或薄荷棒？我好像有點暈。」問滿 4 次。" },
       { cat: "🚐 移動組", text: "3. 路況分析師：坐車只要一煞車，就看著前面搖頭說：「宿霧這條路塞車真的無解。」感慨 4 次。" },
@@ -320,6 +319,7 @@
     let candidateTasks = [];
     let selectedTask = null;
     let oldPlayerName = "";
+    let previousGroupData = null; // 比對新舊進度跳出推播通知用
 
     function hashCode(str) {
       let hash = 0;
@@ -331,6 +331,11 @@
     }
 
     window.onload = () => {
+      // 請求瀏覽器通知權限
+      if ("Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission();
+      }
+
       const savedSelected = localStorage.getItem('cebu_selected_task');
       const savedCandidates = localStorage.getItem('cebu_candidates');
       const savedNotes = localStorage.getItem('cebu_notes');
@@ -353,14 +358,34 @@
         disableDrawBtn('今日已抽牌');
       }
 
-      // 監聽 Firebase 即時同步全團進度
+      // 監聽 Firebase 即時同步全團進度 (含即時推播邏輯)
       progressRef.on('value', (snapshot) => {
         const data = snapshot.val() || {};
+        const myName = document.getElementById('playerName').value.trim();
+
+        // 比對是否有其他人進度更新，跳出通知
+        if (previousGroupData) {
+          Object.keys(data).forEach(player => {
+            if (player !== myName) {
+              const oldVal = previousGroupData[player] ? previousGroupData[player].progress : "0/4";
+              const newVal = data[player] ? data[player].progress : "0/4";
+
+              const oldNum = parseInt(oldVal.split('/')[0]) || 0;
+              const newNum = parseInt(newVal.split('/')[0]) || 0;
+
+              if (newNum > oldNum) {
+                sendNotification(player, newVal);
+              }
+            }
+          });
+        }
+
+        previousGroupData = JSON.parse(JSON.stringify(data));
         renderGroupProgress(data);
 
-        const name = document.getElementById('playerName').value.trim();
-        if (name && data[name] && data[name].checks) {
-          const checks = data[name].checks;
+        // 同步更新自己的打勾 UI
+        if (myName && data[myName] && data[myName].checks) {
+          const checks = data[myName].checks;
           for (let i = 1; i <= 4; i++) {
             document.getElementById(`chk${i}`).checked = !!checks[i - 1];
           }
@@ -371,7 +396,18 @@
       });
     };
 
-    // 修改暱稱：避免打字過程中頻繁建立新使用者
+    function sendNotification(playerName, progress) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        const isDone = progress === "4/4";
+        const title = isDone ? `🎉 ${playerName} 完成了所有任務！` : `🕵️‍♂️ ${playerName} 更新了任務進度！`;
+        const options = {
+          body: `最新進度：${progress}！快去看看他剛剛做了什麼怪動作！`,
+          icon: 'https://fav.farm/🏝️'
+        };
+        new Notification(title, options);
+      }
+    }
+
     document.getElementById('playerName').addEventListener('change', (e) => {
       const newName = e.target.value.trim();
       if (!newName) return;
@@ -537,32 +573,26 @@
       }
     }
 
-    // ☀️ 重置今日任務與全團進度紀錄
     function resetDay() {
       if (confirm('確定要重置並準備下一天的任務嗎？（這將會同步移除全團進度看板上的這項紀錄）')) {
         const name = document.getElementById('playerName').value.trim();
         
-        // 1. 強制移除 Firebase 上當前玩家的紀錄
         if (name) {
           progressRef.child(name).remove();
         }
 
-        // 2. 清空 LocalStorage 快取
         selectedTask = null;
         candidateTasks = [];
         localStorage.removeItem('cebu_selected_task');
         localStorage.removeItem('cebu_candidates');
 
-        // 3. 重置個人勾選進度 UI
         resetChecks();
         
-        // 4. 隱藏任務面板
         document.getElementById('candidateSection').classList.add('hidden');
         document.getElementById('candidateSection').classList.remove('flex');
         document.getElementById('finalSection').classList.add('hidden');
         document.getElementById('finalSection').classList.remove('flex');
 
-        // 5. 恢復抽取按鈕
         const btn = document.getElementById('drawBtn');
         btn.disabled = false;
         btn.innerText = '🎴 取得今日 3 大任務 (每日限 1 次)';
